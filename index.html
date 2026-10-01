@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AV Staffing — Quick Estimator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EDE9E1;
+    --panel: #FAF8F4;
+    --ink: #1E2A38;
+    --ink-soft: #51606E;
+    --rule: #C9C2B2;
+    --blue: #2C5F8A;
+    --blue-soft: #DCE6EC;
+    --brass: #A6752E;
+    --brass-soft: #F0E3CC;
+    --good: #3D6B4F;
+    --bad: #A5432F;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --paper: #171B1F; --panel: #1F252B; --ink: #EDEAE2; --ink-soft: #A8B1B8;
+      --rule: #3A4148; --blue: #6FA3CE; --blue-soft: #26313B; --brass: #D9A85C;
+      --brass-soft: #33291A; --good: #7FBF97; --bad: #E0806D;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #171B1F; --panel: #1F252B; --ink: #EDEAE2; --ink-soft: #A8B1B8;
+    --rule: #3A4148; --blue: #6FA3CE; --blue-soft: #26313B; --brass: #D9A85C;
+    --brass-soft: #33291A; --good: #7FBF97; --bad: #E0806D;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  header.page-head { border-bottom: 1px solid var(--rule); padding-bottom: 28px; margin-bottom: 36px; }
+  h1 {
+    font-family: 'Source Serif 4', serif; font-weight: 600; font-size: clamp(28px, 4vw, 38px);
+    margin: 0 0 10px; letter-spacing: -0.01em;
+  }
+  .dek { font-size: 16px; color: var(--ink-soft); max-width: 66ch; margin: 0; }
+  .method-line {
+    margin-top: 18px; font-size: 14px; color: var(--ink-soft);
+    border-left: 2px solid var(--blue); padding-left: 14px;
+  }
+  .method-line b { color: var(--ink); font-weight: 600; }
+
+  section { margin-bottom: 40px; }
+  h2 { font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 20px; margin: 0 0 4px; }
+  .section-note { color: var(--ink-soft); font-size: 14px; margin: 0 0 18px; }
+
+  /* scenario bar */
+  .scenario-bar {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    background: var(--panel); border: 1px solid var(--rule); padding: 16px 18px; margin-bottom: 28px;
+  }
+  .scenario-bar label { font-size: 12.5px; color: var(--ink-soft); }
+  select#scenarioSelect {
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 15px; font-weight: 500; color: var(--ink);
+    background: var(--paper); border: 1px solid var(--rule); padding: 8px 10px; min-width: 220px;
+  }
+  .scenario-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+  .btn {
+    background: none; border: 1px solid var(--rule); color: var(--ink);
+    font-family: inherit; font-size: 13px; padding: 8px 13px; cursor: pointer;
+  }
+  .btn:hover { border-color: var(--blue); color: var(--blue); }
+  .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .btn.primary:hover { opacity: 0.9; color: #fff; }
+  .btn.danger:hover { border-color: var(--bad); color: var(--bad); }
+  .btn[disabled] { opacity: 0.35; cursor: default; pointer-events: none; }
+
+  .unsaved-badge {
+    font-size: 12px; color: var(--brass); background: var(--brass-soft);
+    padding: 4px 10px; display: none; white-space: nowrap;
+  }
+  .unsaved-badge.show { display: inline-block; }
+
+  .save-row { display: none; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+  .save-row.show { display: flex; }
+  .save-row input[type="text"] {
+    font-family: inherit; font-size: 14px; padding: 7px 10px; border: 1px solid var(--rule);
+    background: var(--paper); color: var(--ink); flex: 1; min-width: 160px;
+  }
+  .share-check {
+    display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-soft); white-space: nowrap;
+  }
+  .shared-status { font-size: 12px; color: var(--ink-soft); }
+  .shared-status.err { color: var(--bad); }
+
+  /* input table */
+  .grid-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .grid-table th {
+    text-align: left; font-weight: 500; color: var(--ink-soft); font-size: 12.5px;
+    padding: 0 10px 8px; border-bottom: 1px solid var(--rule);
+  }
+  .grid-table th.num, .grid-table td.num { text-align: right; }
+  .grid-table td { padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+  .grid-table input[type="text"], .grid-table input[type="number"] {
+    width: 100%; background: transparent; border: none; border-bottom: 1px dashed var(--rule);
+    color: var(--ink); font-family: inherit; font-size: 14px; padding: 4px 2px;
+  }
+  .grid-table input[type="number"] { text-align: right; }
+  .grid-table input:focus { outline: none; border-bottom: 1px solid var(--blue); }
+  .grid-table .seat-col input { color: var(--ink-soft); }
+  .grid-table .rm-btn { background: none; border: none; color: var(--ink-soft); cursor: pointer; font-size: 16px; line-height: 1; padding: 4px; }
+  .grid-table .rm-btn:hover { color: var(--bad); }
+
+  .add-row-btn {
+    margin-top: 14px; background: none; border: 1px solid var(--rule); color: var(--ink);
+    font-family: inherit; font-size: 13.5px; padding: 8px 14px; cursor: pointer;
+  }
+  .add-row-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+  .capacity-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .cap-opt {
+    border: 1px solid var(--rule); padding: 10px 18px; cursor: pointer; font-size: 14px;
+    color: var(--ink-soft); user-select: none;
+  }
+  .cap-opt.active { border-color: var(--blue); background: var(--blue-soft); color: var(--ink); font-weight: 500; }
+
+  .headcount-field {
+    margin-top: 16px; font-size: 14px; color: var(--ink-soft); display: flex; align-items: center; gap: 8px;
+  }
+  .headcount-field input {
+    width: 60px; background: var(--panel); border: 1px solid var(--rule); color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace; font-size: 14px; padding: 5px 8px; text-align: center;
+  }
+
+  .output-panel { background: var(--panel); border: 1px solid var(--rule); padding: 32px; }
+  .hero-row {
+    display: flex; gap: 48px; flex-wrap: wrap; padding-bottom: 24px; margin-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .hero-stat .label { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 6px; }
+  .hero-stat .value { font-family: 'Source Serif 4', serif; font-weight: 700; font-size: 44px; color: var(--brass); line-height: 1; }
+  .hero-stat .value.gap-good { color: var(--good); }
+  .hero-stat .value.gap-bad { color: var(--bad); }
+  .hero-stat .sub { font-size: 12.5px; color: var(--ink-soft); margin-top: 6px; }
+
+  .zone-breakdown-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .zone-breakdown-table th {
+    text-align: left; font-weight: 500; color: var(--ink-soft); font-size: 12px;
+    padding: 0 8px 8px; border-bottom: 1px solid var(--rule);
+  }
+  .zone-breakdown-table th.num, .zone-breakdown-table td.num { text-align: right; }
+  .zone-breakdown-table td { padding: 9px 8px; border-bottom: 1px solid var(--rule); }
+  .bar-cell { min-width: 160px; }
+  .bar-track { background: var(--blue-soft); height: 8px; width: 100%; position: relative; }
+  .bar-fill { background: var(--blue); height: 100%; }
+
+  /* comparison table */
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .compare-table th {
+    text-align: right; font-weight: 500; color: var(--ink-soft); font-size: 12.5px;
+    padding: 0 12px 10px; border-bottom: 1px solid var(--rule);
+  }
+  .compare-table th:first-child, .compare-table td:first-child { text-align: left; }
+  .compare-table td { padding: 12px; border-bottom: 1px solid var(--rule); text-align: right; }
+  .compare-table tr.active-scenario td { background: var(--brass-soft); font-weight: 600; }
+  .compare-table td.scenario-name { font-weight: 500; }
+  .compare-table .del-scenario {
+    background: none; border: none; color: var(--ink-soft); cursor: pointer; font-size: 13px;
+    margin-left: 8px; padding: 2px 5px;
+  }
+  .compare-table .del-scenario:hover { color: var(--bad); }
+
+  footer.notes { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--ink-soft); }
+  footer.notes p { margin: 0 0 10px; }
+  footer.notes b { color: var(--ink); }
+
+  @media (max-width: 640px) {
+    .hero-row { gap: 28px; }
+    .hero-stat .value { font-size: 34px; }
+    .grid-table { font-size: 13px; }
+    .grid-table th:nth-child(4), .grid-table td:nth-child(4) { display: none; }
+    .scenario-actions { margin-left: 0; }
+    .compare-table { font-size: 12.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page-head">
+    <h1>AV Staffing — Quick Estimator</h1>
+    <p class="dek">A two-question, back-of-envelope version of the full room-by-room complexity model — built for a fast read in a meeting, not a replacement for the underlying audit.</p>
+    <p class="method-line">For each area: how many AV-equipped rooms, and how many of those are <b>Active Learning</b> rooms (a wall of collaboration displays, not a single screen)? That one distinction predicts technician workload far better than room count or seat count alone.</p>
+  </header>
+
+  <section>
+    <h2>Scenario</h2>
+    <p class="section-note">Switch between years, or draft a proposal and save it as your own scenario for comparison.</p>
+    <div class="scenario-bar">
+      <label for="scenarioSelect">Viewing:</label>
+      <select id="scenarioSelect"></select>
+      <span class="unsaved-badge" id="unsavedBadge">Unsaved changes</span>
+      <span class="shared-status" id="sharedStatus"></span>
+      <div class="scenario-actions">
+        <button class="btn" id="resetBtn">Reset to saved</button>
+        <button class="btn primary" id="saveAsBtn">Save as new scenario</button>
+        <button class="btn danger" id="deleteBtn">Delete this scenario</button>
+      </div>
+    </div>
+    <div class="save-row" id="saveRow">
+      <input type="text" id="saveNameInput" placeholder="Name this scenario, e.g. &quot;2027 Proposed — Cedar St II&quot;">
+      <label class="share-check"><input type="checkbox" id="shareCheckbox"> Share with everyone</label>
+      <input type="text" id="creatorNameInput" placeholder="Your name (optional)" style="display:none;max-width:160px;">
+      <button class="btn primary" id="confirmSaveBtn">Save</button>
+      <button class="btn" id="cancelSaveBtn">Cancel</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Rooms by area</h2>
+    <table class="grid-table">
+      <thead>
+        <tr>
+          <th style="width:34%">Area</th>
+          <th class="num">Total AV rooms</th>
+          <th class="num">Active Learning rooms</th>
+          <th class="num seat-col">Seats <span style="font-weight:400;">(reference only)</span></th>
+          <th style="width:30px"></th>
+        </tr>
+      </thead>
+      <tbody id="rowBody"></tbody>
+    </table>
+    <button class="add-row-btn" id="addRowBtn">+ Add area</button>
+  </section>
+
+  <section>
+    <h2>Assumed capacity</h2>
+    <p class="section-note">Basic-room-equivalents (BRE) one technician can reasonably support. Applied to every scenario below for a fair comparison.</p>
+    <div class="capacity-row" id="capacityRow">
+      <div class="cap-opt" data-cap="30">30 BRE / tech</div>
+      <div class="cap-opt active" data-cap="40">40 BRE / tech</div>
+      <div class="cap-opt" data-cap="50">50 BRE / tech</div>
+    </div>
+    <div class="headcount-field">
+      Technicians on staff for this scenario:
+      <input type="number" id="currentTechs" value="5" min="0">
+    </div>
+  </section>
+
+  <section>
+    <h2>Estimate — <span id="activeLabel"></span></h2>
+    <div class="output-panel">
+      <div class="hero-row">
+        <div class="hero-stat">
+          <div class="label">Estimated weighted BRE</div>
+          <div class="value" id="outBRE">—</div>
+        </div>
+        <div class="hero-stat">
+          <div class="label">Technicians needed</div>
+          <div class="value" id="outTechs">—</div>
+        </div>
+        <div class="hero-stat">
+          <div class="label">Gap vs. staff on hand</div>
+          <div class="value" id="outGap">—</div>
+          <div class="sub" id="outGapSub"></div>
+        </div>
+      </div>
+      <table class="zone-breakdown-table">
+        <thead>
+          <tr>
+            <th>Area</th><th class="num">Rooms</th><th class="num">Active Learning</th>
+            <th class="num">Est. weighted BRE</th><th class="bar-cell">Share of total</th>
+          </tr>
+        </thead>
+        <tbody id="breakdownBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Compare scenarios</h2>
+    <p class="section-note">Every saved scenario, side by side, at the capacity selected above.</p>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Scenario</th><th>Rooms</th><th>Active Learning</th><th>Weighted BRE</th>
+          <th>Techs needed</th><th>Staff on hand</th><th>Gap</th>
+        </tr>
+      </thead>
+      <tbody id="compareBody"></tbody>
+    </table>
+  </section>
+
+  <footer class="notes">
+    <p><b>The math:</b> Estimated weighted BRE = (Active Learning rooms × 3.5) + (all other rooms × 1.9). Those multipliers come from the 2026 portfolio's own average BRE weight for each group, held constant across scenarios so growth is measured in real terms rather than a shifting yardstick — recalibrate them if the underlying rubric changes materially.</p>
+    <p><b>Accuracy:</b> at the campus-wide level this reproduces the full room-by-room audit almost exactly. At the individual-area level, expect it to run roughly 5–12% off in either direction — close enough for a screening conversation, not a substitute for the full model when a specific staffing decision is on the table.</p>
+    <p><b>Scenarios you save privately</b> stay in this browser only. <b>Scenarios you check "Share with everyone" on</b> are written to a shared Google Sheet and visible to anyone who opens this page — including the room numbers and whatever name you give it, so don't put anything in a shared scenario you wouldn't want a colleague to see.</p>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  const AL_WEIGHT = 3.5;
+  const NONAL_WEIGHT = 1.9;
+  const STORAGE_KEY = 'av-estimator-custom-scenarios-v1';
+  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzml1CegYJoBOZzXGPK3L7nVM4mXx4e-sdin5sDjEbsCUAsQyFTNpzlnp0pqTD8rtaj/exec';
+
+  // JSONP avoids CORS issues with Apps Script web apps entirely — loads the
+  // response as a <script> tag instead of a fetch(), so it works regardless
+  // of whether Apps Script sends CORS headers.
+  function jsonp(url, params) {
+    return new Promise((resolve, reject) => {
+      const cbName = 'jsonp_cb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+      const script = document.createElement('script');
+      let settled = false;
+      window[cbName] = function(data) { settled = true; resolve(data); cleanup(); };
+      function cleanup() { delete window[cbName]; if (script.parentNode) script.parentNode.removeChild(script); }
+      script.onerror = function() { if (!settled) { reject(new Error('JSONP request failed')); cleanup(); } };
+      const qs = Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&');
+      script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + qs + '&callback=' + cbName;
+      document.body.appendChild(script);
+      setTimeout(() => { if (!settled) { reject(new Error('JSONP timeout')); cleanup(); } }, 10000);
+    });
+  }
+
+  const BUILTIN_SCENARIOS = {
+    '2020-actual': {
+      label: '2020 (actual)',
+      builtin: true,
+      currentTechs: 5,
+      rows: [
+        { name: 'Central', rooms: 33, al: 0, seats: null },
+        { name: 'MLC',     rooms: 30, al: 0, seats: null },
+        { name: 'North',   rooms: 33, al: 0, seats: null },
+        { name: 'SLC',     rooms: 37, al: 2, seats: null },
+        { name: 'South',   rooms: 29, al: 0, seats: null },
+      ],
+    },
+    '2026-actual': {
+      label: '2026 (actual)',
+      builtin: true,
+      currentTechs: 5,
+      rows: [
+        { name: 'Central', rooms: 34, al: 5,  seats: 2015 },
+        { name: 'MLC',     rooms: 41, al: 7,  seats: 3310 },
+        { name: 'North',   rooms: 19, al: 0,  seats: 2059 },
+        { name: 'SLC',     rooms: 65, al: 23, seats: 3243 },
+        { name: 'South',   rooms: 22, al: 2,  seats: 2435 },
+      ],
+    },
+    '2027-proposed': {
+      label: '2027 (proposed — starter)',
+      builtin: true,
+      currentTechs: 5,
+      rows: [
+        { name: 'Central', rooms: 34, al: 5,  seats: 2015 },
+        { name: 'MLC',     rooms: 41, al: 7,  seats: 3310 },
+        { name: 'North',   rooms: 19, al: 0,  seats: 2059 },
+        { name: 'SLC',     rooms: 65, al: 23, seats: 3243 },
+        { name: 'South',   rooms: 22, al: 2,  seats: 2435 },
+        { name: 'Proposed additions (edit me)', rooms: 0, al: 0, seats: 0 },
+      ],
+    },
+  };
+
+  let customScenarios = {};
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) customScenarios = JSON.parse(saved) || {};
+  } catch (e) { customScenarios = {}; }
+
+  let sharedScenarios = {};
+
+  function allScenarios() {
+    return Object.assign({}, BUILTIN_SCENARIOS, sharedScenarios, customScenarios);
+  }
+
+  function refreshShared() {
+    const statusEl = document.getElementById('sharedStatus');
+    if (!SHEETS_URL) return Promise.resolve();
+    statusEl.textContent = 'Syncing shared scenarios…';
+    statusEl.classList.remove('err');
+    return jsonp(SHEETS_URL, { action: 'list' }).then(rows => {
+      sharedScenarios = {};
+      (rows || []).forEach(row => {
+        let parsedRows = [];
+        try { parsedRows = JSON.parse(row.rowsJson); } catch (e) { parsedRows = []; }
+        sharedScenarios[row.id] = {
+          label: row.name + ' (shared)',
+          builtin: false,
+          shared: true,
+          currentTechs: parseFloat(row.currentTechs) || 0,
+          rows: parsedRows,
+        };
+      });
+      statusEl.textContent = '';
+      populateSelect();
+      renderComparison();
+    }).catch(() => {
+      statusEl.textContent = 'Could not reach the shared sheet — check the deployment URL and access settings.';
+      statusEl.classList.add('err');
+    });
+  }
+
+  function persistCustom() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(customScenarios)); }
+    catch (e) { /* storage unavailable — scenario just won't persist across reloads */ }
+  }
+
+  function cloneRows(rows) { return rows.map(r => Object.assign({}, r)); }
+
+  let activeKey = '2026-actual';
+  let capacity = 40;
+  let unsaved = false;
+
+  const scenarioSelect = document.getElementById('scenarioSelect');
+  const rowBody = document.getElementById('rowBody');
+  const breakdownBody = document.getElementById('breakdownBody');
+  const compareBody = document.getElementById('compareBody');
+  const unsavedBadge = document.getElementById('unsavedBadge');
+  const saveRow = document.getElementById('saveRow');
+  const saveNameInput = document.getElementById('saveNameInput');
+  const currentTechsInput = document.getElementById('currentTechs');
+  const activeLabel = document.getElementById('activeLabel');
+  const resetBtn = document.getElementById('resetBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+
+  function populateSelect() {
+    scenarioSelect.innerHTML = '';
+    const builtinGroup = document.createElement('optgroup');
+    builtinGroup.label = 'Built in';
+    Object.keys(BUILTIN_SCENARIOS).forEach(key => {
+      const opt = document.createElement('option');
+      opt.value = key; opt.textContent = BUILTIN_SCENARIOS[key].label;
+      builtinGroup.appendChild(opt);
+    });
+    scenarioSelect.appendChild(builtinGroup);
+
+    const sharedKeys = Object.keys(sharedScenarios);
+    if (sharedKeys.length) {
+      const sharedGroup = document.createElement('optgroup');
+      sharedGroup.label = 'Shared (everyone)';
+      sharedKeys.forEach(key => {
+        const opt = document.createElement('option');
+        opt.value = key; opt.textContent = sharedScenarios[key].label;
+        sharedGroup.appendChild(opt);
+      });
+      scenarioSelect.appendChild(sharedGroup);
+    }
+
+    const customKeys = Object.keys(customScenarios);
+    if (customKeys.length) {
+      const customGroup = document.createElement('optgroup');
+      customGroup.label = 'Saved by you';
+      customKeys.forEach(key => {
+        const opt = document.createElement('option');
+        opt.value = key; opt.textContent = customScenarios[key].label;
+        customGroup.appendChild(opt);
+      });
+      scenarioSelect.appendChild(customGroup);
+    }
+    scenarioSelect.value = activeKey;
+  }
+
+  function loadScenario(key, markUnsaved) {
+    const scen = allScenarios()[key];
+    if (!scen) return;
+    activeKey = key;
+    unsaved = !!markUnsaved;
+    activeLabel.textContent = scen.label;
+    currentTechsInput.value = scen.currentTechs != null ? scen.currentTechs : 5;
+    rowBody.innerHTML = '';
+    cloneRows(scen.rows).forEach(makeRow);
+    deleteBtn.disabled = !!scen.builtin;
+    updateUnsavedUI();
+    recalc();
+  }
+
+  function updateUnsavedUI() {
+    unsavedBadge.classList.toggle('show', unsaved);
+    resetBtn.disabled = !unsaved;
+  }
+
+  function markUnsaved() { unsaved = true; updateUnsavedUI(); recalc(); }
+
+  function makeRow(data) {
+    const tr = document.createElement('tr');
+    const seatVal = (data.seats === null || data.seats === undefined) ? '' : data.seats;
+    tr.innerHTML = `
+      <td><input type="text" class="f-name" value="${data.name}"></td>
+      <td class="num"><input type="number" class="f-rooms" value="${data.rooms}" min="0"></td>
+      <td class="num"><input type="number" class="f-al" value="${data.al}" min="0"></td>
+      <td class="num seat-col"><input type="number" class="f-seats" value="${seatVal}" min="0" placeholder="—"></td>
+      <td><button class="rm-btn" title="Remove area">×</button></td>
+    `;
+    tr.querySelectorAll('input').forEach(inp => inp.addEventListener('input', markUnsaved));
+    tr.querySelector('.rm-btn').addEventListener('click', () => { tr.remove(); markUnsaved(); });
+    rowBody.appendChild(tr);
+  }
+
+  function readCurrentRows() {
+    return Array.from(rowBody.querySelectorAll('tr')).map(tr => {
+      const name = tr.querySelector('.f-name').value || 'Area';
+      const rooms = parseFloat(tr.querySelector('.f-rooms').value) || 0;
+      let al = parseFloat(tr.querySelector('.f-al').value) || 0;
+      al = Math.min(al, rooms);
+      const seatsRaw = tr.querySelector('.f-seats').value;
+      const seats = seatsRaw === '' ? null : (parseFloat(seatsRaw) || 0);
+      return { name, rooms, al, seats };
+    });
+  }
+
+  function computeTotals(rows, techs) {
+    let totalRooms = 0, totalAL = 0, totalBRE = 0;
+    rows.forEach(r => {
+      const nonal = Math.max(r.rooms - r.al, 0);
+      totalRooms += r.rooms;
+      totalAL += r.al;
+      totalBRE += r.al * AL_WEIGHT + nonal * NONAL_WEIGHT;
+    });
+    const techsNeeded = capacity > 0 ? totalBRE / capacity : 0;
+    const gap = techsNeeded - (techs || 0);
+    return { totalRooms, totalAL, totalBRE, techsNeeded, gap };
+  }
+
+  function recalc() {
+    const rows = readCurrentRows();
+    const techs = parseFloat(currentTechsInput.value) || 0;
+    const totals = computeTotals(rows, techs);
+
+    document.getElementById('outBRE').textContent = totals.totalBRE.toFixed(1);
+    document.getElementById('outTechs').textContent = totals.techsNeeded.toFixed(1);
+
+    const gapEl = document.getElementById('outGap');
+    const gapSub = document.getElementById('outGapSub');
+    gapEl.textContent = (totals.gap >= 0 ? '+' : '') + totals.gap.toFixed(1);
+    gapEl.classList.remove('gap-good', 'gap-bad');
+    if (totals.gap > 0.05) { gapEl.classList.add('gap-bad'); gapSub.textContent = 'more technicians than currently on staff'; }
+    else if (totals.gap < -0.05) { gapEl.classList.add('gap-good'); gapSub.textContent = 'fewer technicians than currently on staff'; }
+    else { gapSub.textContent = 'about right at this capacity'; }
+
+    breakdownBody.innerHTML = '';
+    const maxBRE = Math.max(...rows.map(r => r.al * AL_WEIGHT + Math.max(r.rooms - r.al, 0) * NONAL_WEIGHT), 1);
+    rows.forEach(r => {
+      const bre = r.al * AL_WEIGHT + Math.max(r.rooms - r.al, 0) * NONAL_WEIGHT;
+      const pct = totals.totalBRE > 0 ? ((bre / totals.totalBRE) * 100).toFixed(0) : 0;
+      const barPct = (bre / maxBRE) * 100;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${r.name}</td><td class="num">${r.rooms}</td><td class="num">${r.al}</td>
+        <td class="num">${bre.toFixed(1)}</td>
+        <td class="bar-cell">
+          <div class="bar-track"><div class="bar-fill" style="width:${barPct}%"></div></div>
+          <div style="font-size:11.5px;color:var(--ink-soft);margin-top:3px;">${pct}% of total</div>
+        </td>`;
+      breakdownBody.appendChild(tr);
+    });
+
+    renderComparison();
+  }
+
+  function renderComparison() {
+    compareBody.innerHTML = '';
+    const scenarios = allScenarios();
+    Object.keys(scenarios).forEach(key => {
+      const scen = scenarios[key];
+      const rows = (key === activeKey) ? readCurrentRows() : scen.rows;
+      const techs = (key === activeKey) ? (parseFloat(currentTechsInput.value) || 0) : (scen.currentTechs || 0);
+      const totals = computeTotals(rows, techs);
+      const tr = document.createElement('tr');
+      if (key === activeKey) tr.classList.add('active-scenario');
+      const delBtn = scen.builtin ? '' : `<button class="del-scenario" data-key="${key}" data-shared="${scen.shared ? '1' : '0'}" title="Delete">🗑</button>`;
+      tr.innerHTML = `
+        <td class="scenario-name">${scen.label}${key===activeKey && unsaved ? ' <span style="color:var(--brass);font-weight:400;font-size:12px;">(editing)</span>' : ''}${delBtn}</td>
+        <td>${totals.totalRooms}</td>
+        <td>${totals.totalAL}</td>
+        <td>${totals.totalBRE.toFixed(1)}</td>
+        <td>${totals.techsNeeded.toFixed(1)}</td>
+        <td>${techs}</td>
+        <td style="color:${totals.gap>0.05?'var(--bad)':(totals.gap<-0.05?'var(--good)':'var(--ink-soft)')}">${(totals.gap>=0?'+':'')+totals.gap.toFixed(1)}</td>
+      `;
+      compareBody.appendChild(tr);
+    });
+    compareBody.querySelectorAll('.del-scenario').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const key = btn.dataset.key;
+        const isShared = btn.dataset.shared === '1';
+        if (isShared) {
+          const scen = sharedScenarios[key];
+          if (!scen || !confirm(`Delete shared scenario "${scen.label}"? This removes it for everyone, not just you.`)) return;
+          jsonp(SHEETS_URL, { action: 'delete', id: key })
+            .then(() => refreshShared())
+            .then(() => { if (activeKey === key) loadScenario('2026-actual', false); })
+            .catch(() => alert('Could not delete from the shared sheet.'));
+        } else {
+          if (!confirm(`Delete saved scenario "${customScenarios[key].label}"? This can't be undone.`)) return;
+          delete customScenarios[key];
+          persistCustom();
+          if (activeKey === key) loadScenario('2026-actual', false);
+          populateSelect();
+          renderComparison();
+        }
+      });
+    });
+  }
+
+  // wire up controls
+  document.getElementById('addRowBtn').addEventListener('click', () => {
+    makeRow({ name: 'New area', rooms: 0, al: 0, seats: null });
+    markUnsaved();
+  });
+
+  document.getElementById('capacityRow').addEventListener('click', (e) => {
+    const opt = e.target.closest('.cap-opt');
+    if (!opt) return;
+    document.querySelectorAll('.cap-opt').forEach(o => o.classList.remove('active'));
+    opt.classList.add('active');
+    capacity = parseFloat(opt.dataset.cap);
+    recalc();
+  });
+
+  currentTechsInput.addEventListener('input', () => { unsaved = true; updateUnsavedUI(); recalc(); });
+
+  scenarioSelect.addEventListener('change', () => {
+    if (unsaved && !confirm('Discard unsaved changes to the current scenario?')) {
+      scenarioSelect.value = activeKey;
+      return;
+    }
+    loadScenario(scenarioSelect.value, false);
+  });
+
+  resetBtn.addEventListener('click', () => { loadScenario(activeKey, false); });
+
+  const shareCheckbox = document.getElementById('shareCheckbox');
+  const creatorNameInput = document.getElementById('creatorNameInput');
+  shareCheckbox.addEventListener('change', () => {
+    creatorNameInput.style.display = shareCheckbox.checked ? '' : 'none';
+  });
+
+  document.getElementById('saveAsBtn').addEventListener('click', () => {
+    saveNameInput.value = '';
+    shareCheckbox.checked = false;
+    creatorNameInput.style.display = 'none';
+    creatorNameInput.value = '';
+    saveRow.classList.add('show');
+    saveNameInput.focus();
+  });
+  document.getElementById('cancelSaveBtn').addEventListener('click', () => { saveRow.classList.remove('show'); });
+  document.getElementById('confirmSaveBtn').addEventListener('click', () => {
+    const name = saveNameInput.value.trim();
+    if (!name) { saveNameInput.focus(); return; }
+    const rows = readCurrentRows();
+    const techs = parseFloat(currentTechsInput.value) || 0;
+
+    if (shareCheckbox.checked) {
+      const id = 'shared-' + Date.now();
+      const creator = creatorNameInput.value.trim();
+      const confirmBtn = document.getElementById('confirmSaveBtn');
+      confirmBtn.disabled = true; confirmBtn.textContent = 'Saving…';
+      jsonp(SHEETS_URL, { action: 'save', id: id, name: name, currentTechs: techs, rows: JSON.stringify(rows), createdBy: creator })
+        .then(() => { saveRow.classList.remove('show'); return refreshShared(); })
+        .then(() => { loadScenario(id, false); })
+        .catch(() => { alert('Could not save to the shared sheet — check the deployment URL and access settings.'); })
+        .finally(() => { confirmBtn.disabled = false; confirmBtn.textContent = 'Save'; });
+    } else {
+      const key = 'custom-' + Date.now();
+      customScenarios[key] = { label: name, builtin: false, currentTechs: techs, rows: rows };
+      persistCustom();
+      saveRow.classList.remove('show');
+      populateSelect();
+      loadScenario(key, false);
+    }
+  });
+
+  deleteBtn.addEventListener('click', () => {
+    const scen = allScenarios()[activeKey];
+    if (!scen || scen.builtin) return;
+    if (scen.shared) {
+      if (!confirm(`Delete shared scenario "${scen.label}"? This removes it for everyone, not just you.`)) return;
+      jsonp(SHEETS_URL, { action: 'delete', id: activeKey })
+        .then(() => refreshShared())
+        .then(() => { loadScenario('2026-actual', false); })
+        .catch(() => alert('Could not delete from the shared sheet.'));
+    } else {
+      if (!confirm(`Delete saved scenario "${scen.label}"? This can't be undone.`)) return;
+      delete customScenarios[activeKey];
+      persistCustom();
+      populateSelect();
+      loadScenario('2026-actual', false);
+    }
+  });
+
+  populateSelect();
+  loadScenario(activeKey, false);
+  refreshShared();
+})();
+</script>
+</body>
+</html>
