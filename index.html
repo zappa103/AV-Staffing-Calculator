@@ -303,8 +303,8 @@
     <p class="section-note">Basic room equivalents (BRE) one technician can reasonably support. Applied to every portfolio below for a like-for-like comparison.</p>
     <div class="capacity-row" id="capacityRow" role="radiogroup" aria-label="BRE per technician">
       <button class="cap-opt" data-cap="30" role="radio">30 BRE / tech</button>
-      <button class="cap-opt active" data-cap="40" role="radio">40 BRE / tech</button>
-      <button class="cap-opt" data-cap="50" role="radio">50 BRE / tech</button>
+      <button class="cap-opt" data-cap="40" role="radio">40 BRE / tech</button>
+      <button class="cap-opt active" data-cap="50" role="radio">50 BRE / tech</button>
       <button class="cap-opt" data-cap="60" role="radio">60 BRE / tech</button>
     </div>
     <div class="headcount-field">
@@ -520,7 +520,7 @@
       label: '2027 Proposed Zones',
       builtin: true,
       proposal: true,
-      currentTechs: 5,
+      currentTechs: 6,
       rows: [
         { name: 'MLC',           rooms: 36, al: 2,  seats: 2954 },
         { name: 'North East',    rooms: 24, al: 4,  seats: 1755 },
@@ -579,7 +579,7 @@
   function cloneRows(rows) { return rows.map(r => Object.assign({}, r)); }
 
   let activeKey = '2026-actual';
-  let capacity = 40;
+  let capacity = 50;
   let unsaved = false;
 
   const scenarioSelect = document.getElementById('scenarioSelect');
