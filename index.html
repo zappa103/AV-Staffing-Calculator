@@ -409,7 +409,7 @@
     </div>
     <div class="def">
       <h3>Portfolio</h3>
-      <p>A complete set of rooms-by-zone numbers plus the technician headcount. The built-in portfolios are the 2020 and 2026 complexity audits; saved portfolios model proposed changes such as new buildings or renovations.</p>
+      <p>A complete set of rooms-by-zone numbers plus the technician headcount. The built-in portfolios are the 2020 and 2026 complexity audits and the 2027 proposed zone layout; saved portfolios model proposed changes such as new buildings or renovations.</p>
     </div>
   </div>
 
@@ -516,6 +516,20 @@
         { name: 'South',   rooms: 22, al: 2,  seats: 2435 },
       ],
     },
+    '2027-proposed-zones': {
+      label: '2027 Proposed Zones',
+      builtin: true,
+      proposal: true,
+      currentTechs: 5,
+      rows: [
+        { name: 'MLC',           rooms: 36, al: 2,  seats: 2954 },
+        { name: 'North East',    rooms: 24, al: 4,  seats: 1755 },
+        { name: 'North West',    rooms: 29, al: 1,  seats: 2319 },
+        { name: 'SLC',           rooms: 40, al: 2,  seats: 1765 },
+        { name: 'South',         rooms: 28, al: 22, seats: 1658 },
+        { name: 'South Central', rooms: 24, al: 6,  seats: 2611 },
+      ],
+    },
   };
 
   let customScenarios = {};
@@ -582,8 +596,11 @@
 
   function populateSelect() {
     scenarioSelect.innerHTML = '';
+    const audits = {}, proposals = {};
+    Object.keys(BUILTIN_SCENARIOS).forEach(k => { (BUILTIN_SCENARIOS[k].proposal ? proposals : audits)[k] = BUILTIN_SCENARIOS[k]; });
     const groups = [
-      ['Complexity audits', BUILTIN_SCENARIOS],
+      ['Complexity audits', audits],
+      ['Proposals', proposals],
       ['Shared', sharedScenarios],
       ['Saved by you', customScenarios],
     ];
