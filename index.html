@@ -3,275 +3,441 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AV Staffing — Quick Estimator</title>
+<title>AV Support Staffing Calculator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --paper: #EDE9E1;
-    --panel: #FAF8F4;
-    --ink: #1E2A38;
-    --ink-soft: #51606E;
-    --rule: #C9C2B2;
-    --blue: #2C5F8A;
-    --blue-soft: #DCE6EC;
-    --brass: #A6752E;
-    --brass-soft: #F0E3CC;
-    --good: #3D6B4F;
-    --bad: #A5432F;
+    --bg: #F3F5F8;
+    --card: #FFFFFF;
+    --ink: #17212E;
+    --ink-soft: #5A6675;
+    --ink-muted: #8A94A2;
+    --rule: #E1E6EC;
+    --rule-strong: #CBD3DC;
+    --navy: #14263D;
+    --navy-2: #1E3A5C;
+    --accent: #2A78D6;
+    --accent-soft: #E6F0FB;
+    --series-1: #2A78D6;
+    --series-2: #EB6834;
+    --warn: #B7791F;
+    --warn-soft: #FBF1DE;
+    --good: #2F7A4F;
+    --good-soft: #E3F2E9;
+    --bad: #B4412C;
+    --bad-soft: #FBE7E2;
+    --shadow: 0 1px 2px rgba(20,38,61,.06), 0 4px 16px rgba(20,38,61,.06);
+    --radius: 12px;
+    color-scheme: light;
   }
-  :root:not([data-theme="light"]) {
-    @media (prefers-color-scheme: dark) {
-      --paper: #171B1F; --panel: #1F252B; --ink: #EDEAE2; --ink-soft: #A8B1B8;
-      --rule: #3A4148; --blue: #6FA3CE; --blue-soft: #26313B; --brass: #D9A85C;
-      --brass-soft: #33291A; --good: #7FBF97; --bad: #E0806D;
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11161C; --card: #19212A; --ink: #ECEFF3; --ink-soft: #A9B3BF; --ink-muted: #7D8794;
+      --rule: #29333E; --rule-strong: #3A4552; --navy: #0B1118; --navy-2: #16273B;
+      --accent: #5598E7; --accent-soft: #1C2D42; --series-1: #3987E5; --series-2: #D95926;
+      --warn: #E0A84A; --warn-soft: #33291A; --good: #6FC193; --good-soft: #17301F;
+      --bad: #E58571; --bad-soft: #3A1E19; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+      color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-    --paper: #171B1F; --panel: #1F252B; --ink: #EDEAE2; --ink-soft: #A8B1B8;
-    --rule: #3A4148; --blue: #6FA3CE; --blue-soft: #26313B; --brass: #D9A85C;
-    --brass-soft: #33291A; --good: #7FBF97; --bad: #E0806D;
+    --bg: #11161C; --card: #19212A; --ink: #ECEFF3; --ink-soft: #A9B3BF; --ink-muted: #7D8794;
+    --rule: #29333E; --rule-strong: #3A4552; --navy: #0B1118; --navy-2: #16273B;
+    --accent: #5598E7; --accent-soft: #1C2D42; --series-1: #3987E5; --series-2: #D95926;
+    --warn: #E0A84A; --warn-soft: #33291A; --good: #6FC193; --good-soft: #17301F;
+    --bad: #E58571; --bad-soft: #3A1E19; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+    color-scheme: dark;
   }
   * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
-    margin: 0; background: var(--paper); color: var(--ink);
-    font-family: 'IBM Plex Sans', sans-serif; line-height: 1.5; -webkit-font-smoothing: antialiased;
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif; line-height: 1.5; -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 1040px; margin: 0 auto; padding: 48px 24px 80px; }
+  .num-font, .tabular { font-variant-numeric: tabular-nums; }
 
-  header.page-head { border-bottom: 1px solid var(--rule); padding-bottom: 28px; margin-bottom: 36px; }
+  /* ---------- header ---------- */
+  .masthead {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+    color: #fff; padding: 40px 16px 0;
+  }
+  .masthead-inner { max-width: 1080px; margin: 0 auto; }
+  .eyebrow {
+    font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #9FC2EA; font-weight: 600; margin: 0 0 10px;
+  }
   h1 {
-    font-family: 'Source Serif 4', serif; font-weight: 600; font-size: clamp(28px, 4vw, 38px);
-    margin: 0 0 10px; letter-spacing: -0.01em;
+    font-family: 'Source Serif 4', Georgia, serif; font-weight: 700; font-size: clamp(28px, 4.2vw, 40px);
+    margin: 0 0 12px; letter-spacing: -0.01em; line-height: 1.15;
   }
-  .dek { font-size: 16px; color: var(--ink-soft); max-width: 66ch; margin: 0; }
-  .method-line {
-    margin-top: 18px; font-size: 14px; color: var(--ink-soft);
-    border-left: 2px solid var(--blue); padding-left: 14px;
+  .dek { font-size: 16.5px; color: #D3DEEA; max-width: 68ch; margin: 0; }
+  .tabs { display: flex; gap: 4px; margin-top: 30px; }
+  .tab {
+    appearance: none; border: none; background: transparent; color: #B9C9DB;
+    font-family: inherit; font-size: 14.5px; font-weight: 500; padding: 12px 18px; cursor: pointer;
+    border-radius: 10px 10px 0 0;
   }
-  .method-line b { color: var(--ink); font-weight: 600; }
+  .tab:hover { color: #fff; }
+  .tab[aria-selected="true"] { background: var(--bg); color: var(--ink); }
 
-  section { margin-bottom: 40px; }
-  h2 { font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 20px; margin: 0 0 4px; }
-  .section-note { color: var(--ink-soft); font-size: 14px; margin: 0 0 18px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 16px 72px; }
+  .panel[hidden] { display: none; }
 
-  /* scenario bar */
-  .scenario-bar {
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-    background: var(--panel); border: 1px solid var(--rule); padding: 16px 18px; margin-bottom: 28px;
+  /* ---------- cards ---------- */
+  .card {
+    background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 24px; margin-bottom: 24px;
   }
-  .scenario-bar label { font-size: 12.5px; color: var(--ink-soft); }
+  .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  h2 { font-family: 'Source Serif 4', Georgia, serif; font-weight: 600; font-size: 21px; margin: 0; }
+  .step {
+    display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent); font-size: 12.5px; font-weight: 600; margin-right: 10px;
+    vertical-align: 3px; font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .section-note { color: var(--ink-soft); font-size: 14px; margin: 4px 0 18px; }
+  .two-col { display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; }
+  .two-col > .card { margin-bottom: 0; }
+  .stack { margin-bottom: 24px; }
+
+  /* ---------- portfolio bar ---------- */
+  .portfolio-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .portfolio-bar label { font-size: 13px; color: var(--ink-soft); font-weight: 500; }
   select#scenarioSelect {
-    font-family: 'IBM Plex Sans', sans-serif; font-size: 15px; font-weight: 500; color: var(--ink);
-    background: var(--paper); border: 1px solid var(--rule); padding: 8px 10px; min-width: 220px;
+    font-family: inherit; font-size: 15px; font-weight: 500; color: var(--ink);
+    background: var(--bg); border: 1px solid var(--rule-strong); border-radius: 8px; padding: 9px 12px; min-width: 240px; max-width: 100%;
   }
-  .scenario-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+  .portfolio-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
   .btn {
-    background: none; border: 1px solid var(--rule); color: var(--ink);
-    font-family: inherit; font-size: 13px; padding: 8px 13px; cursor: pointer;
+    background: var(--card); border: 1px solid var(--rule-strong); color: var(--ink); border-radius: 8px;
+    font-family: inherit; font-size: 13.5px; font-weight: 500; padding: 8px 14px; cursor: pointer;
+    transition: border-color .15s, color .15s, background .15s;
   }
-  .btn:hover { border-color: var(--blue); color: var(--blue); }
-  .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
-  .btn.primary:hover { opacity: 0.9; color: #fff; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { filter: brightness(1.08); color: #fff; }
   .btn.danger:hover { border-color: var(--bad); color: var(--bad); }
-  .btn[disabled] { opacity: 0.35; cursor: default; pointer-events: none; }
+  .btn[disabled] { opacity: 0.4; cursor: default; pointer-events: none; }
 
-  .unsaved-badge {
-    font-size: 12px; color: var(--brass); background: var(--brass-soft);
-    padding: 4px 10px; display: none; white-space: nowrap;
-  }
-  .unsaved-badge.show { display: inline-block; }
-
-  .save-row { display: none; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
-  .save-row.show { display: flex; }
-  .save-row input[type="text"] {
-    font-family: inherit; font-size: 14px; padding: 7px 10px; border: 1px solid var(--rule);
-    background: var(--paper); color: var(--ink); flex: 1; min-width: 160px;
-  }
-  .share-check {
-    display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-soft); white-space: nowrap;
-  }
-  .shared-status { font-size: 12px; color: var(--ink-soft); }
+  .pill { font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 999px; white-space: nowrap; display: none; }
+  .pill.show { display: inline-block; }
+  .pill.warn { color: var(--warn); background: var(--warn-soft); }
+  .shared-status { font-size: 12.5px; color: var(--ink-soft); }
   .shared-status.err { color: var(--bad); }
 
-  /* input table */
+  .save-row {
+    display: none; gap: 10px; align-items: center; margin-top: 16px; flex-wrap: wrap;
+    padding: 14px; border-radius: 10px; background: var(--bg); border: 1px solid var(--rule);
+  }
+  .save-row.show { display: flex; }
+  .save-row input[type="text"] {
+    font-family: inherit; font-size: 14px; padding: 8px 10px; border: 1px solid var(--rule-strong); border-radius: 8px;
+    background: var(--card); color: var(--ink); flex: 1; min-width: 160px;
+  }
+  .share-check { display: flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink-soft); white-space: nowrap; }
+  .save-hint { flex-basis: 100%; font-size: 12.5px; color: var(--ink-muted); margin: 0; }
+
+  /* ---------- inputs table ---------- */
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .grid-table { width: 100%; border-collapse: collapse; font-size: 14px; }
   .grid-table th {
-    text-align: left; font-weight: 500; color: var(--ink-soft); font-size: 12.5px;
-    padding: 0 10px 8px; border-bottom: 1px solid var(--rule);
+    text-align: left; font-weight: 600; color: var(--ink-soft); font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
+    padding: 0 10px 10px; border-bottom: 1px solid var(--rule);
   }
   .grid-table th.num, .grid-table td.num { text-align: right; }
-  .grid-table td { padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+  .grid-table td { padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+  .grid-table tr:last-child td { border-bottom: none; }
   .grid-table input[type="text"], .grid-table input[type="number"] {
-    width: 100%; background: transparent; border: none; border-bottom: 1px dashed var(--rule);
-    color: var(--ink); font-family: inherit; font-size: 14px; padding: 4px 2px;
+    width: 100%; background: transparent; border: 1px solid transparent; border-radius: 6px;
+    color: var(--ink); font-family: inherit; font-size: 14px; padding: 7px 8px;
+    font-variant-numeric: tabular-nums; transition: border-color .15s, background .15s;
   }
+  .grid-table input:hover { border-color: var(--rule); }
   .grid-table input[type="number"] { text-align: right; }
-  .grid-table input:focus { outline: none; border-bottom: 1px solid var(--blue); }
+  .grid-table input:focus { outline: none; border-color: var(--accent); background: var(--accent-soft); }
   .grid-table .seat-col input { color: var(--ink-soft); }
-  .grid-table .rm-btn { background: none; border: none; color: var(--ink-soft); cursor: pointer; font-size: 16px; line-height: 1; padding: 4px; }
-  .grid-table .rm-btn:hover { color: var(--bad); }
-
+  .grid-table .rm-btn {
+    background: none; border: none; color: var(--ink-muted); cursor: pointer; font-size: 18px; line-height: 1;
+    padding: 4px 6px; border-radius: 6px;
+  }
+  .grid-table .rm-btn:hover { color: var(--bad); background: var(--bad-soft); }
   .add-row-btn {
-    margin-top: 14px; background: none; border: 1px solid var(--rule); color: var(--ink);
-    font-family: inherit; font-size: 13.5px; padding: 8px 14px; cursor: pointer;
+    margin-top: 12px; background: none; border: 1px dashed var(--rule-strong); color: var(--ink-soft); border-radius: 8px;
+    font-family: inherit; font-size: 13.5px; font-weight: 500; padding: 8px 14px; cursor: pointer;
   }
-  .add-row-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .add-row-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-  .capacity-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  /* ---------- capacity ---------- */
+  .segmented {
+    display: inline-grid; grid-template-columns: repeat(4, 1fr); background: var(--bg); border: 1px solid var(--rule);
+    border-radius: 10px; padding: 4px; gap: 4px; width: 100%;
+  }
   .cap-opt {
-    border: 1px solid var(--rule); padding: 10px 18px; cursor: pointer; font-size: 14px;
-    color: var(--ink-soft); user-select: none;
+    appearance: none; border: none; background: transparent; border-radius: 7px; padding: 10px 6px; cursor: pointer;
+    font-family: inherit; font-size: 14px; color: var(--ink-soft); text-align: center; line-height: 1.25;
   }
-  .cap-opt.active { border-color: var(--blue); background: var(--blue-soft); color: var(--ink); font-weight: 500; }
-
+  .cap-opt b { display: block; font-size: 18px; color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .cap-opt span { font-size: 11.5px; }
+  .cap-opt:hover { color: var(--ink); }
+  .cap-opt.active { background: var(--card); box-shadow: 0 1px 3px rgba(20,38,61,.15); color: var(--accent); }
+  .cap-opt.active b { color: var(--accent); }
   .headcount-field {
-    margin-top: 16px; font-size: 14px; color: var(--ink-soft); display: flex; align-items: center; gap: 8px;
+    margin-top: 20px; font-size: 14px; color: var(--ink-soft); display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding-top: 18px; border-top: 1px solid var(--rule);
   }
   .headcount-field input {
-    width: 60px; background: var(--panel); border: 1px solid var(--rule); color: var(--ink);
-    font-family: 'IBM Plex Mono', monospace; font-size: 14px; padding: 5px 8px; text-align: center;
+    width: 80px; background: var(--bg); border: 1px solid var(--rule-strong); border-radius: 8px; color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace; font-size: 16px; padding: 7px 8px; text-align: center;
   }
 
-  .output-panel { background: var(--panel); border: 1px solid var(--rule); padding: 32px; }
-  .hero-row {
-    display: flex; gap: 48px; flex-wrap: wrap; padding-bottom: 24px; margin-bottom: 24px;
-    border-bottom: 1px solid var(--rule);
+  /* ---------- results ---------- */
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 18px 0 24px; }
+  .kpi { border: 1px solid var(--rule); border-radius: 10px; padding: 18px 20px; background: var(--bg); }
+  .kpi .label { font-size: 12.5px; color: var(--ink-soft); font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
+  .kpi .value {
+    font-family: 'Source Serif 4', Georgia, serif; font-weight: 700; font-size: 44px; line-height: 1.05; margin-top: 8px;
+    font-variant-numeric: tabular-nums;
   }
-  .hero-stat .label { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 6px; }
-  .hero-stat .value { font-family: 'Source Serif 4', serif; font-weight: 700; font-size: 44px; color: var(--brass); line-height: 1; }
-  .hero-stat .value.gap-good { color: var(--good); }
-  .hero-stat .value.gap-bad { color: var(--bad); }
-  .hero-stat .sub { font-size: 12.5px; color: var(--ink-soft); margin-top: 6px; }
+  .kpi .sub { font-size: 13px; color: var(--ink-soft); margin-top: 6px; }
+  .kpi.gap-bad { background: var(--bad-soft); border-color: transparent; }
+  .kpi.gap-bad .value { color: var(--bad); }
+  .kpi.gap-good { background: var(--good-soft); border-color: transparent; }
+  .kpi.gap-good .value { color: var(--good); }
 
-  .zone-breakdown-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .zone-breakdown-table { width: 100%; border-collapse: collapse; font-size: 14px; }
   .zone-breakdown-table th {
-    text-align: left; font-weight: 500; color: var(--ink-soft); font-size: 12px;
-    padding: 0 8px 8px; border-bottom: 1px solid var(--rule);
+    text-align: left; font-weight: 600; color: var(--ink-soft); font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
+    padding: 0 8px 10px; border-bottom: 1px solid var(--rule);
   }
-  .zone-breakdown-table th.num, .zone-breakdown-table td.num { text-align: right; }
-  .zone-breakdown-table td { padding: 9px 8px; border-bottom: 1px solid var(--rule); }
-  .bar-cell { min-width: 160px; }
-  .bar-track { background: var(--blue-soft); height: 8px; width: 100%; position: relative; }
-  .bar-fill { background: var(--blue); height: 100%; }
+  .zone-breakdown-table th.num, .zone-breakdown-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .zone-breakdown-table td { padding: 11px 8px; border-bottom: 1px solid var(--rule); }
+  .zone-breakdown-table tr:last-child td { border-bottom: none; }
+  .bar-cell { min-width: 180px; width: 32%; }
+  .bar-wrap { display: flex; align-items: center; gap: 10px; }
+  .bar-track { background: var(--accent-soft); height: 8px; flex: 1; border-radius: 4px; overflow: hidden; }
+  .bar-fill { background: var(--series-1); height: 100%; border-radius: 0 4px 4px 0; }
+  .bar-pct { font-size: 12.5px; color: var(--ink-soft); width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
 
-  /* comparison table */
-  .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  /* ---------- chart ---------- */
+  .chart-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .seg-small { display: inline-flex; background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; padding: 3px; gap: 3px; }
+  .seg-small button {
+    appearance: none; border: none; background: transparent; font-family: inherit; font-size: 13px; font-weight: 500;
+    color: var(--ink-soft); padding: 6px 12px; border-radius: 6px; cursor: pointer;
+  }
+  .seg-small button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(20,38,61,.15); }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--ink-soft); }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid; }
+  .legend i.dash { border-top-style: dashed; }
+  .chart-box { position: relative; width: 100%; }
+  .chart-box svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .chart-box .grid-line { stroke: var(--rule); stroke-width: 1; }
+  .chart-box .axis-text { fill: var(--ink-muted); font-size: 12px; font-family: 'IBM Plex Sans', sans-serif; }
+  .chart-box .x-text { fill: var(--ink-soft); font-size: 12.5px; font-family: 'IBM Plex Sans', sans-serif; }
+  .chart-box .x-text.active { fill: var(--ink); font-weight: 600; }
+  .chart-box .end-label { font-size: 12.5px; font-weight: 600; font-family: 'IBM Plex Sans', sans-serif; fill: var(--ink); }
+  .chart-box .crosshair { stroke: var(--rule-strong); stroke-width: 1; }
+  .tooltip {
+    position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--rule-strong); border-radius: 8px;
+    box-shadow: var(--shadow); padding: 10px 12px; font-size: 13px; min-width: 170px; opacity: 0; transition: opacity .12s;
+    z-index: 5;
+  }
+  .tooltip.show { opacity: 1; }
+  .tooltip .t-title { font-weight: 600; margin-bottom: 6px; }
+  .tooltip .t-row { display: flex; align-items: center; gap: 8px; justify-content: space-between; color: var(--ink-soft); }
+  .tooltip .t-row b { color: var(--ink); font-variant-numeric: tabular-nums; font-weight: 600; }
+  .tooltip .sw { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .chart-empty { color: var(--ink-muted); font-size: 14px; padding: 30px 0; text-align: center; }
+
+  /* ---------- comparison table ---------- */
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 20px; }
   .compare-table th {
-    text-align: right; font-weight: 500; color: var(--ink-soft); font-size: 12.5px;
-    padding: 0 12px 10px; border-bottom: 1px solid var(--rule);
+    text-align: right; font-weight: 600; color: var(--ink-soft); font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
+    padding: 0 12px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap;
   }
   .compare-table th:first-child, .compare-table td:first-child { text-align: left; }
-  .compare-table td { padding: 12px; border-bottom: 1px solid var(--rule); text-align: right; }
-  .compare-table tr.active-scenario td { background: var(--brass-soft); font-weight: 600; }
+  .compare-table td { padding: 12px; border-bottom: 1px solid var(--rule); text-align: right; font-variant-numeric: tabular-nums; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr.active-scenario td { background: var(--accent-soft); font-weight: 600; }
+  .compare-table tr.active-scenario td:first-child { border-radius: 8px 0 0 8px; }
+  .compare-table tr.active-scenario td:last-child { border-radius: 0 8px 8px 0; }
   .compare-table td.scenario-name { font-weight: 500; }
   .compare-table .del-scenario {
-    background: none; border: none; color: var(--ink-soft); cursor: pointer; font-size: 13px;
-    margin-left: 8px; padding: 2px 5px;
+    background: none; border: none; color: var(--ink-muted); cursor: pointer; font-size: 12.5px;
+    margin-left: 8px; padding: 2px 6px; border-radius: 4px; font-family: inherit;
   }
-  .compare-table .del-scenario:hover { color: var(--bad); }
+  .compare-table .del-scenario:hover { color: var(--bad); background: var(--bad-soft); }
+  .editing-tag { color: var(--warn); font-weight: 500; font-size: 12px; margin-left: 6px; }
 
-  footer.notes { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--ink-soft); }
-  footer.notes p { margin: 0 0 10px; }
-  footer.notes b { color: var(--ink); }
+  /* ---------- method note ---------- */
+  .method {
+    display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: start;
+    background: var(--card); border: 1px solid var(--rule); border-left: 4px solid var(--accent); border-radius: var(--radius);
+    padding: 22px 24px; box-shadow: var(--shadow);
+  }
+  .method h3 { font-family: 'Source Serif 4', Georgia, serif; font-size: 18px; margin: 0 0 8px; }
+  .method p { margin: 0 0 10px; font-size: 14.5px; color: var(--ink-soft); max-width: 78ch; }
+  .method p:last-child { margin-bottom: 0; }
+  .method b { color: var(--ink); }
+  .formula {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; background: var(--bg); border: 1px solid var(--rule);
+    border-radius: 8px; padding: 10px 14px; color: var(--ink); display: inline-block; margin: 2px 0 12px;
+  }
+  .method-icon {
+    width: 40px; height: 40px; border-radius: 10px; background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .link-btn { background: none; border: none; padding: 0; color: var(--accent); font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 
+  /* ---------- definitions ---------- */
+  .defs-intro { color: var(--ink-soft); font-size: 15px; max-width: 72ch; margin: 0 0 24px; }
+  .def-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 32px; }
+  .def {
+    background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow);
+  }
+  .def h3 { font-size: 16px; margin: 0 0 6px; font-weight: 600; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .def h3 .abbr { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--accent); background: var(--accent-soft); padding: 2px 7px; border-radius: 4px; font-weight: 500; }
+  .def p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+  .def p + p { margin-top: 8px; }
+  .defs-section-title { font-family: 'Source Serif 4', Georgia, serif; font-size: 22px; margin: 8px 0 14px; }
+  .tier-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .tier-table th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); padding: 0 10px 10px; border-bottom: 1px solid var(--rule); font-weight: 600; }
+  .tier-table td { padding: 11px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .tier-table tr:last-child td { border-bottom: none; }
+  .tier-table td.num, .tier-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tier-badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+  .factor-list { margin: 0; padding-left: 20px; font-size: 14px; color: var(--ink-soft); }
+  .factor-list li { margin-bottom: 6px; }
+  .factor-list b { color: var(--ink); }
+
+  footer.page-foot { max-width: 1080px; margin: 0 auto; padding: 0 16px 40px; font-size: 12.5px; color: var(--ink-muted); }
+
+  @media (max-width: 860px) {
+    .two-col { grid-template-columns: 1fr; }
+    .def-grid { grid-template-columns: 1fr; }
+  }
   @media (max-width: 640px) {
-    .hero-row { gap: 28px; }
-    .hero-stat .value { font-size: 34px; }
+    .card { padding: 18px 16px; }
+    .kpis { grid-template-columns: 1fr; gap: 10px; }
+    .kpi .value { font-size: 36px; }
     .grid-table { font-size: 13px; }
     .grid-table th:nth-child(4), .grid-table td:nth-child(4) { display: none; }
-    .scenario-actions { margin-left: 0; }
+    .portfolio-actions { margin-left: 0; }
     .compare-table { font-size: 12.5px; }
+    .bar-cell { min-width: 110px; }
+    .method { grid-template-columns: 1fr; }
+    .method-icon { display: none; }
+    .tab { padding: 10px 12px; font-size: 14px; }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header class="page-head">
-    <h1>AV Staffing — Quick Estimator</h1>
-    <p class="dek">A two-question, back-of-envelope version of the full room-by-room complexity model — built for a fast read in a meeting, not a replacement for the underlying audit.</p>
-    <p class="method-line">For each area: how many AV-equipped rooms, and how many of those are <b>Active Learning</b> rooms (a wall of collaboration displays, not a single screen)? That one distinction predicts technician workload far better than room count or seat count alone.</p>
-  </header>
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow">Classroom Technology Support</p>
+    <h1>AV Support Staffing Calculator</h1>
+    <p class="dek">Estimates how many technicians are needed to support campus AV rooms, based on how many rooms each area has and how many of them are complex Active Learning spaces. Use it to see where current staffing stands and how planned room changes would affect workload.</p>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="tab-calc" aria-controls="panel-calc" aria-selected="true">Calculator</button>
+      <button class="tab" role="tab" id="tab-defs" aria-controls="panel-defs" aria-selected="false">Definitions &amp; Method</button>
+    </nav>
+  </div>
+</header>
 
-  <section>
-    <h2>Scenario</h2>
-    <p class="section-note">Switch between years, or draft a proposal and save it as your own scenario for comparison.</p>
-    <div class="scenario-bar">
-      <label for="scenarioSelect">Viewing:</label>
+<main class="wrap">
+
+<!-- ================= CALCULATOR ================= -->
+<div class="panel" id="panel-calc" role="tabpanel" aria-labelledby="tab-calc">
+
+  <section class="card">
+    <div class="card-head"><h2><span class="step">1</span>Room portfolio</h2></div>
+    <p class="section-note">Choose a year's actual room inventory, or edit the numbers to model a proposal and save it as a new portfolio for comparison.</p>
+    <div class="portfolio-bar">
+      <label for="scenarioSelect">Viewing</label>
       <select id="scenarioSelect"></select>
-      <span class="unsaved-badge" id="unsavedBadge">Unsaved changes</span>
+      <span class="pill warn" id="unsavedBadge">Unsaved changes</span>
       <span class="shared-status" id="sharedStatus"></span>
-      <div class="scenario-actions">
-        <button class="btn" id="resetBtn">Reset to saved</button>
-        <button class="btn primary" id="saveAsBtn">Save as new scenario</button>
-        <button class="btn danger" id="deleteBtn">Delete this scenario</button>
+      <div class="portfolio-actions">
+        <button class="btn" id="resetBtn">Reset</button>
+        <button class="btn primary" id="saveAsBtn">Save as new portfolio</button>
+        <button class="btn danger" id="deleteBtn">Delete</button>
       </div>
     </div>
     <div class="save-row" id="saveRow">
-      <input type="text" id="saveNameInput" placeholder="Name this scenario, e.g. &quot;2027 Proposed — Cedar St II&quot;">
+      <input type="text" id="saveNameInput" placeholder="Portfolio name, e.g. &quot;2027 Proposed — Cedar St II&quot;">
       <label class="share-check"><input type="checkbox" id="shareCheckbox"> Share with everyone</label>
-      <input type="text" id="creatorNameInput" placeholder="Your name (optional)" style="display:none;max-width:160px;">
+      <input type="text" id="creatorNameInput" placeholder="Your name (optional)" style="display:none;max-width:180px;">
       <button class="btn primary" id="confirmSaveBtn">Save</button>
       <button class="btn" id="cancelSaveBtn">Cancel</button>
+      <p class="save-hint">Unshared portfolios are kept in this browser only. Shared portfolios are visible to anyone who opens this page.</p>
     </div>
   </section>
 
-  <section>
-    <h2>Rooms by area</h2>
-    <table class="grid-table">
-      <thead>
-        <tr>
-          <th style="width:34%">Area</th>
-          <th class="num">Total AV rooms</th>
-          <th class="num">Active Learning rooms</th>
-          <th class="num seat-col">Seats <span style="font-weight:400;">(reference only)</span></th>
-          <th style="width:30px"></th>
-        </tr>
-      </thead>
-      <tbody id="rowBody"></tbody>
-    </table>
-    <button class="add-row-btn" id="addRowBtn">+ Add area</button>
-  </section>
-
-  <section>
-    <h2>Assumed capacity</h2>
-    <p class="section-note">Basic-room-equivalents (BRE) one technician can reasonably support. Applied to every scenario below for a fair comparison.</p>
-    <div class="capacity-row" id="capacityRow">
-      <div class="cap-opt" data-cap="30">30 BRE / tech</div>
-      <div class="cap-opt active" data-cap="40">40 BRE / tech</div>
-      <div class="cap-opt" data-cap="50">50 BRE / tech</div>
-    </div>
-    <div class="headcount-field">
-      Technicians on staff for this scenario:
-      <input type="number" id="currentTechs" value="5" min="0">
-    </div>
-  </section>
-
-  <section>
-    <h2>Estimate — <span id="activeLabel"></span></h2>
-    <div class="output-panel">
-      <div class="hero-row">
-        <div class="hero-stat">
-          <div class="label">Estimated weighted BRE</div>
-          <div class="value" id="outBRE">—</div>
-        </div>
-        <div class="hero-stat">
-          <div class="label">Technicians needed</div>
-          <div class="value" id="outTechs">—</div>
-        </div>
-        <div class="hero-stat">
-          <div class="label">Gap vs. staff on hand</div>
-          <div class="value" id="outGap">—</div>
-          <div class="sub" id="outGapSub"></div>
-        </div>
+  <div class="two-col stack">
+    <section class="card">
+      <div class="card-head"><h2><span class="step">2</span>Rooms by area</h2></div>
+      <p class="section-note">AV-equipped rooms in each support area, and how many of those are Active Learning rooms.</p>
+      <div class="table-scroll">
+        <table class="grid-table">
+          <thead>
+            <tr>
+              <th style="width:36%">Area</th>
+              <th class="num">AV rooms</th>
+              <th class="num">Active Learning</th>
+              <th class="num seat-col">Seats</th>
+              <th style="width:34px"><span class="sr-only" style="position:absolute;left:-9999px">Remove</span></th>
+            </tr>
+          </thead>
+          <tbody id="rowBody"></tbody>
+        </table>
       </div>
+      <button class="add-row-btn" id="addRowBtn">+ Add area</button>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2><span class="step">3</span>Assumptions</h2></div>
+      <p class="section-note">Workload one technician can support, in basic room equivalents (BRE). Applied to every portfolio for a like-for-like comparison.</p>
+      <div class="segmented" id="capacityRow" role="radiogroup" aria-label="BRE per technician">
+        <button class="cap-opt" data-cap="30" role="radio"><b>30</b><span>BRE / tech</span></button>
+        <button class="cap-opt active" data-cap="40" role="radio"><b>40</b><span>BRE / tech</span></button>
+        <button class="cap-opt" data-cap="50" role="radio"><b>50</b><span>BRE / tech</span></button>
+        <button class="cap-opt" data-cap="60" role="radio"><b>60</b><span>BRE / tech</span></button>
+      </div>
+      <div class="headcount-field">
+        <label for="currentTechs">Technicians on staff</label>
+        <input type="number" id="currentTechs" value="5" min="0">
+      </div>
+    </section>
+  </div>
+
+  <section class="card">
+    <div class="card-head"><h2>Estimate — <span id="activeLabel"></span></h2></div>
+    <div class="kpis">
+      <div class="kpi">
+        <div class="label">Weighted workload</div>
+        <div class="value" id="outBRE">—</div>
+        <div class="sub">BRE across all areas</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Technicians needed</div>
+        <div class="value" id="outTechs">—</div>
+        <div class="sub" id="outTechsSub"></div>
+      </div>
+      <div class="kpi" id="gapCard">
+        <div class="label">Staffing gap</div>
+        <div class="value" id="outGap">—</div>
+        <div class="sub" id="outGapSub"></div>
+      </div>
+    </div>
+    <div class="table-scroll">
       <table class="zone-breakdown-table">
         <thead>
           <tr>
             <th>Area</th><th class="num">Rooms</th><th class="num">Active Learning</th>
-            <th class="num">Est. weighted BRE</th><th class="bar-cell">Share of total</th>
+            <th class="num">Weighted BRE</th><th class="bar-cell">Share of workload</th>
           </tr>
         </thead>
         <tbody id="breakdownBody"></tbody>
@@ -279,27 +445,134 @@
     </div>
   </section>
 
-  <section>
-    <h2>Compare scenarios</h2>
-    <p class="section-note">Every saved scenario, side by side, at the capacity selected above.</p>
-    <table class="compare-table">
-      <thead>
-        <tr>
-          <th>Scenario</th><th>Rooms</th><th>Active Learning</th><th>Weighted BRE</th>
-          <th>Techs needed</th><th>Staff on hand</th><th>Gap</th>
-        </tr>
-      </thead>
-      <tbody id="compareBody"></tbody>
-    </table>
+  <section class="card">
+    <div class="card-head"><h2>Compare portfolios</h2></div>
+    <p class="section-note">Every saved portfolio side by side, at the capacity selected above.</p>
+    <div class="chart-toolbar">
+      <div class="seg-small" role="group" aria-label="Chart view">
+        <button type="button" data-view="staff" aria-pressed="true">Staffing</button>
+        <button type="button" data-view="load" aria-pressed="false">Workload</button>
+      </div>
+      <div class="legend" id="chartLegend"></div>
+    </div>
+    <div class="chart-box" id="chartBox">
+      <div class="tooltip" id="chartTip"></div>
+    </div>
+    <div class="table-scroll">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Portfolio</th><th>Rooms</th><th>Active Learning</th><th>Weighted BRE</th>
+            <th>Techs needed</th><th>On staff</th><th>Gap</th>
+          </tr>
+        </thead>
+        <tbody id="compareBody"></tbody>
+      </table>
+    </div>
   </section>
 
-  <footer class="notes">
-    <p><b>The math:</b> Estimated weighted BRE = (Active Learning rooms × 3.5) + (all other rooms × 1.9). Those multipliers come from the 2026 portfolio's own average BRE weight for each group, held constant across scenarios so growth is measured in real terms rather than a shifting yardstick — recalibrate them if the underlying rubric changes materially.</p>
-    <p><b>Accuracy:</b> at the campus-wide level this reproduces the full room-by-room audit almost exactly. At the individual-area level, expect it to run roughly 5–12% off in either direction — close enough for a screening conversation, not a substitute for the full model when a specific staffing decision is on the table.</p>
-    <p><b>Scenarios you save privately</b> stay in this browser only. <b>Scenarios you check "Share with everyone" on</b> are written to a shared Google Sheet and visible to anyone who opens this page — including the room numbers and whatever name you give it, so don't put anything in a shared scenario you wouldn't want a colleague to see.</p>
-  </footer>
-
+  <section class="method">
+    <div class="method-icon" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="8" y2="11"/><line x1="12" y1="11" x2="12" y2="11"/><line x1="16" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="12" y1="15" x2="12" y2="15"/><line x1="16" y1="15" x2="16" y2="18"/><line x1="8" y1="18" x2="12" y2="18"/></svg>
+    </div>
+    <div>
+      <h3>How the math works</h3>
+      <div class="formula">Weighted BRE = (Active Learning rooms × 3.5) + (all other rooms × 1.9)</div>
+      <p>This calculator is a condensed version of the full room-by-room complexity audit. In that audit, every AV room on campus is scored on five factors (display, control and switching, audio, video conferencing / lecture capture, and room type), placed into one of four complexity tiers, and weighted accordingly. Summing those weights gives the portfolio's total workload in basic room equivalents.</p>
+      <p>Analysis of the 2026 audit showed that one question, <b>is this an Active Learning room?</b>, accounts for most of the difference in workload between rooms. Active Learning rooms averaged <b>3.5 BRE</b> each; all other rooms averaged <b>1.9 BRE</b>. Those two averages are held constant across every portfolio so that change is measured against a fixed yardstick.</p>
+      <p><b>Technicians needed</b> = Weighted BRE ÷ BRE per technician. <b>Gap</b> = technicians needed − technicians on staff. See <button class="link-btn" data-goto="defs">Definitions &amp; Method</button> for terms and the tier weights.</p>
+    </div>
+  </section>
 </div>
+
+<!-- ================= DEFINITIONS ================= -->
+<div class="panel" id="panel-defs" role="tabpanel" aria-labelledby="tab-defs" hidden>
+  <p class="defs-intro">The terms used in this calculator and the complexity audit behind it.</p>
+
+  <div class="def-grid">
+    <div class="def">
+      <h3>Basic Room Equivalent <span class="abbr">BRE</span></h3>
+      <p>The unit of AV support workload. One BRE is the support effort for a single basic, single-display classroom (Tier 1). More complex rooms count as more than one BRE.</p>
+    </div>
+    <div class="def">
+      <h3>Weighted BRE</h3>
+      <p>The total workload for an area or the whole campus: every room's BRE weight added together. Unlike a simple room count, it rises when existing rooms are upgraded with more technology, not only when new rooms are added.</p>
+    </div>
+    <div class="def">
+      <h3>Active Learning room</h3>
+      <p>A room built for group work, with multiple collaboration displays around the walls rather than a single screen at the front, typically with more sources, switching, and audio to match. In the audit these are identified by the wall-display collaboration flag. They are the most support-intensive room type, averaging 3.5 BRE.</p>
+    </div>
+    <div class="def">
+      <h3>Other AV rooms</h3>
+      <p>Every AV-equipped room that is not an Active Learning room, from basic classrooms to large lecture halls with lecture capture. Across the 2026 inventory these averaged 1.9 BRE.</p>
+    </div>
+    <div class="def">
+      <h3>Area</h3>
+      <p>A geographic support zone that a technician or group of technicians covers. The current areas are Central, MLC, North, SLC, and South. Areas can be added or renamed when modeling a proposal.</p>
+    </div>
+    <div class="def">
+      <h3>Seats</h3>
+      <p>Total seating capacity in an area's AV rooms. Shown for reference only; seat count does not drive the staffing estimate, because a large lecture hall is not necessarily harder to support than a small, complex room.</p>
+    </div>
+    <div class="def">
+      <h3>BRE per technician <span class="abbr">capacity</span></h3>
+      <p>How much weighted workload one technician can reasonably support, including preventive maintenance, trouble calls, event support, and upgrades. The calculator offers 30, 40, 50, and 60 so the estimate can be viewed across a range of assumptions rather than a single number.</p>
+    </div>
+    <div class="def">
+      <h3>Technicians needed</h3>
+      <p>Weighted BRE divided by BRE per technician: the full-time technician headcount the workload calls for at the selected capacity.</p>
+    </div>
+    <div class="def">
+      <h3>Staffing gap</h3>
+      <p>Technicians needed minus technicians on staff. A positive number (shown in red) means the workload calls for more technicians than are currently on staff; a negative number (green) means current staff exceeds the estimate.</p>
+    </div>
+    <div class="def">
+      <h3>Portfolio</h3>
+      <p>A complete set of rooms-by-area numbers plus the technician headcount. The built-in portfolios are the actual 2020 and 2026 inventories; saved portfolios model proposed changes such as new buildings or renovations.</p>
+    </div>
+  </div>
+
+  <h2 class="defs-section-title">The full complexity audit</h2>
+  <div class="two-col stack">
+    <section class="card">
+      <h3 style="margin:0 0 10px;font-size:16px;">Complexity tiers</h3>
+      <p class="section-note" style="margin-top:0">Each room's rubric score places it in a tier, and the tier sets its BRE weight.</p>
+      <table class="tier-table">
+        <thead><tr><th>Tier</th><th>Complexity</th><th class="num">BRE weight</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tier-badge">Tier 1</span></td><td>Lowest rubric scores</td><td class="num">1.0</td></tr>
+          <tr><td><span class="tier-badge">Tier 2</span></td><td>Moderate</td><td class="num">1.5</td></tr>
+          <tr><td><span class="tier-badge">Tier 3</span></td><td>High</td><td class="num">2.25</td></tr>
+          <tr><td><span class="tier-badge">Tier 4</span></td><td>Complex: highest rubric scores</td><td class="num">3.5</td></tr>
+        </tbody>
+      </table>
+    </section>
+    <section class="card">
+      <h3 style="margin:0 0 10px;font-size:16px;">Scoring factors</h3>
+      <p class="section-note" style="margin-top:0">Every room is scored on five factors.</p>
+      <ol class="factor-list">
+        <li><b>Display</b>: number and type of displays and projectors</li>
+        <li><b>Control &amp; switching</b>: control system and signal routing</li>
+        <li><b>Audio</b>: program audio, voice reinforcement, microphones</li>
+        <li><b>Video conferencing / lecture capture</b>: cameras, capture, document cameras</li>
+        <li><b>Room type</b>: standard classroom through Active Learning and SCALE-UP</li>
+      </ol>
+    </section>
+  </div>
+
+  <section class="method">
+    <div class="method-icon" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
+    </div>
+    <div>
+      <h3>Where the calculator came from</h3>
+      <p>The full audit is the detailed model: every room scored, tiered, and weighted. The calculator compresses it into two inputs per area so the staffing picture can be explored live in a meeting. Using the 2026 audit, the average BRE weight was computed separately for Active Learning rooms (3.5) and all other rooms (1.9). Multiplying each area's room counts by those averages closely reproduces the audit's campus-wide total.</p>
+      <p>Because the two averages are fixed, the calculator responds to changes in the number and mix of rooms. If the rubric or the typical room build changes significantly, the averages should be recalculated from a fresh audit.</p>
+    </div>
+  </section>
+</div>
+
+</main>
 
 <script>
 (function() {
@@ -308,9 +581,7 @@
   const STORAGE_KEY = 'av-estimator-custom-scenarios-v1';
   const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzml1CegYJoBOZzXGPK3L7nVM4mXx4e-sdin5sDjEbsCUAsQyFTNpzlnp0pqTD8rtaj/exec';
 
-  // JSONP avoids CORS issues with Apps Script web apps entirely — loads the
-  // response as a <script> tag instead of a fetch(), so it works regardless
-  // of whether Apps Script sends CORS headers.
+  // JSONP avoids CORS issues with Apps Script web apps entirely.
   function jsonp(url, params) {
     return new Promise((resolve, reject) => {
       const cbName = 'jsonp_cb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
@@ -324,6 +595,10 @@
       document.body.appendChild(script);
       setTimeout(() => { if (!settled) { reject(new Error('JSONP timeout')); cleanup(); } }, 10000);
     });
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
   }
 
   const BUILTIN_SCENARIOS = {
@@ -351,19 +626,6 @@
         { name: 'South',   rooms: 22, al: 2,  seats: 2435 },
       ],
     },
-    '2027-proposed': {
-      label: '2027 (proposed — starter)',
-      builtin: true,
-      currentTechs: 5,
-      rows: [
-        { name: 'Central', rooms: 34, al: 5,  seats: 2015 },
-        { name: 'MLC',     rooms: 41, al: 7,  seats: 3310 },
-        { name: 'North',   rooms: 19, al: 0,  seats: 2059 },
-        { name: 'SLC',     rooms: 65, al: 23, seats: 3243 },
-        { name: 'South',   rooms: 22, al: 2,  seats: 2435 },
-        { name: 'Proposed additions (edit me)', rooms: 0, al: 0, seats: 0 },
-      ],
-    },
   };
 
   let customScenarios = {};
@@ -381,7 +643,7 @@
   function refreshShared() {
     const statusEl = document.getElementById('sharedStatus');
     if (!SHEETS_URL) return Promise.resolve();
-    statusEl.textContent = 'Syncing shared scenarios…';
+    statusEl.textContent = 'Syncing shared portfolios…';
     statusEl.classList.remove('err');
     return jsonp(SHEETS_URL, { action: 'list' }).then(rows => {
       sharedScenarios = {};
@@ -400,14 +662,14 @@
       populateSelect();
       renderComparison();
     }).catch(() => {
-      statusEl.textContent = 'Could not reach the shared sheet — check the deployment URL and access settings.';
+      statusEl.textContent = 'Shared portfolios are unavailable right now.';
       statusEl.classList.add('err');
     });
   }
 
   function persistCustom() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(customScenarios)); }
-    catch (e) { /* storage unavailable — scenario just won't persist across reloads */ }
+    catch (e) { /* storage unavailable */ }
   }
 
   function cloneRows(rows) { return rows.map(r => Object.assign({}, r)); }
@@ -415,6 +677,7 @@
   let activeKey = '2026-actual';
   let capacity = 40;
   let unsaved = false;
+  let chartView = 'staff';
 
   const scenarioSelect = document.getElementById('scenarioSelect');
   const rowBody = document.getElementById('rowBody');
@@ -430,38 +693,24 @@
 
   function populateSelect() {
     scenarioSelect.innerHTML = '';
-    const builtinGroup = document.createElement('optgroup');
-    builtinGroup.label = 'Built in';
-    Object.keys(BUILTIN_SCENARIOS).forEach(key => {
-      const opt = document.createElement('option');
-      opt.value = key; opt.textContent = BUILTIN_SCENARIOS[key].label;
-      builtinGroup.appendChild(opt);
+    const groups = [
+      ['Actual inventory', BUILTIN_SCENARIOS],
+      ['Shared', sharedScenarios],
+      ['Saved by you', customScenarios],
+    ];
+    groups.forEach(([label, set]) => {
+      const keys = Object.keys(set);
+      if (!keys.length) return;
+      const g = document.createElement('optgroup');
+      g.label = label;
+      keys.forEach(key => {
+        const opt = document.createElement('option');
+        opt.value = key; opt.textContent = set[key].label;
+        g.appendChild(opt);
+      });
+      scenarioSelect.appendChild(g);
     });
-    scenarioSelect.appendChild(builtinGroup);
-
-    const sharedKeys = Object.keys(sharedScenarios);
-    if (sharedKeys.length) {
-      const sharedGroup = document.createElement('optgroup');
-      sharedGroup.label = 'Shared (everyone)';
-      sharedKeys.forEach(key => {
-        const opt = document.createElement('option');
-        opt.value = key; opt.textContent = sharedScenarios[key].label;
-        sharedGroup.appendChild(opt);
-      });
-      scenarioSelect.appendChild(sharedGroup);
-    }
-
-    const customKeys = Object.keys(customScenarios);
-    if (customKeys.length) {
-      const customGroup = document.createElement('optgroup');
-      customGroup.label = 'Saved by you';
-      customKeys.forEach(key => {
-        const opt = document.createElement('option');
-        opt.value = key; opt.textContent = customScenarios[key].label;
-        customGroup.appendChild(opt);
-      });
-      scenarioSelect.appendChild(customGroup);
-    }
+    if (!allScenarios()[activeKey]) activeKey = '2026-actual';
     scenarioSelect.value = activeKey;
   }
 
@@ -469,6 +718,7 @@
     const scen = allScenarios()[key];
     if (!scen) return;
     activeKey = key;
+    scenarioSelect.value = key;
     unsaved = !!markUnsaved;
     activeLabel.textContent = scen.label;
     currentTechsInput.value = scen.currentTechs != null ? scen.currentTechs : 5;
@@ -490,11 +740,11 @@
     const tr = document.createElement('tr');
     const seatVal = (data.seats === null || data.seats === undefined) ? '' : data.seats;
     tr.innerHTML = `
-      <td><input type="text" class="f-name" value="${data.name}"></td>
-      <td class="num"><input type="number" class="f-rooms" value="${data.rooms}" min="0"></td>
-      <td class="num"><input type="number" class="f-al" value="${data.al}" min="0"></td>
-      <td class="num seat-col"><input type="number" class="f-seats" value="${seatVal}" min="0" placeholder="—"></td>
-      <td><button class="rm-btn" title="Remove area">×</button></td>
+      <td><input type="text" class="f-name" value="${esc(data.name)}" aria-label="Area name"></td>
+      <td class="num"><input type="number" class="f-rooms" value="${data.rooms}" min="0" aria-label="AV rooms"></td>
+      <td class="num"><input type="number" class="f-al" value="${data.al}" min="0" aria-label="Active Learning rooms"></td>
+      <td class="num seat-col"><input type="number" class="f-seats" value="${seatVal}" min="0" placeholder="—" aria-label="Seats"></td>
+      <td><button class="rm-btn" title="Remove area" aria-label="Remove area">×</button></td>
     `;
     tr.querySelectorAll('input').forEach(inp => inp.addEventListener('input', markUnsaved));
     tr.querySelector('.rm-btn').addEventListener('click', () => { tr.remove(); markUnsaved(); });
@@ -533,14 +783,16 @@
 
     document.getElementById('outBRE').textContent = totals.totalBRE.toFixed(1);
     document.getElementById('outTechs').textContent = totals.techsNeeded.toFixed(1);
+    document.getElementById('outTechsSub').textContent = `at ${capacity} BRE per technician`;
 
     const gapEl = document.getElementById('outGap');
+    const gapCard = document.getElementById('gapCard');
     const gapSub = document.getElementById('outGapSub');
     gapEl.textContent = (totals.gap >= 0 ? '+' : '') + totals.gap.toFixed(1);
-    gapEl.classList.remove('gap-good', 'gap-bad');
-    if (totals.gap > 0.05) { gapEl.classList.add('gap-bad'); gapSub.textContent = 'more technicians than currently on staff'; }
-    else if (totals.gap < -0.05) { gapEl.classList.add('gap-good'); gapSub.textContent = 'fewer technicians than currently on staff'; }
-    else { gapSub.textContent = 'about right at this capacity'; }
+    gapCard.classList.remove('gap-good', 'gap-bad');
+    if (totals.gap > 0.05) { gapCard.classList.add('gap-bad'); gapSub.textContent = `technicians short of need (${techs} on staff)`; }
+    else if (totals.gap < -0.05) { gapCard.classList.add('gap-good'); gapSub.textContent = `technicians above need (${techs} on staff)`; }
+    else { gapSub.textContent = `staffing matches need (${techs} on staff)`; }
 
     breakdownBody.innerHTML = '';
     const maxBRE = Math.max(...rows.map(r => r.al * AL_WEIGHT + Math.max(r.rooms - r.al, 0) * NONAL_WEIGHT), 1);
@@ -550,65 +802,239 @@
       const barPct = (bre / maxBRE) * 100;
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${r.name}</td><td class="num">${r.rooms}</td><td class="num">${r.al}</td>
+        <td>${esc(r.name)}</td><td class="num">${r.rooms}</td><td class="num">${r.al}</td>
         <td class="num">${bre.toFixed(1)}</td>
-        <td class="bar-cell">
+        <td class="bar-cell"><div class="bar-wrap">
           <div class="bar-track"><div class="bar-fill" style="width:${barPct}%"></div></div>
-          <div style="font-size:11.5px;color:var(--ink-soft);margin-top:3px;">${pct}% of total</div>
-        </td>`;
+          <span class="bar-pct">${pct}%</span>
+        </div></td>`;
       breakdownBody.appendChild(tr);
     });
 
     renderComparison();
   }
 
-  function renderComparison() {
-    compareBody.innerHTML = '';
+  function comparisonData() {
     const scenarios = allScenarios();
-    Object.keys(scenarios).forEach(key => {
+    return Object.keys(scenarios).map(key => {
       const scen = scenarios[key];
-      const rows = (key === activeKey) ? readCurrentRows() : scen.rows;
-      const techs = (key === activeKey) ? (parseFloat(currentTechsInput.value) || 0) : (scen.currentTechs || 0);
-      const totals = computeTotals(rows, techs);
+      const isActive = key === activeKey;
+      const rows = isActive ? readCurrentRows() : scen.rows;
+      const techs = isActive ? (parseFloat(currentTechsInput.value) || 0) : (scen.currentTechs || 0);
+      return { key, scen, isActive, techs, totals: computeTotals(rows, techs) };
+    });
+  }
+
+  function renderComparison() {
+    const data = comparisonData();
+    compareBody.innerHTML = '';
+    data.forEach(({ key, scen, isActive, techs, totals }) => {
       const tr = document.createElement('tr');
-      if (key === activeKey) tr.classList.add('active-scenario');
-      const delBtn = scen.builtin ? '' : `<button class="del-scenario" data-key="${key}" data-shared="${scen.shared ? '1' : '0'}" title="Delete">🗑</button>`;
+      if (isActive) tr.classList.add('active-scenario');
+      const delBtn = scen.builtin ? '' : `<button class="del-scenario" data-key="${esc(key)}" data-shared="${scen.shared ? '1' : '0'}" title="Delete portfolio">Delete</button>`;
+      const gapColor = totals.gap > 0.05 ? 'var(--bad)' : (totals.gap < -0.05 ? 'var(--good)' : 'var(--ink-soft)');
       tr.innerHTML = `
-        <td class="scenario-name">${scen.label}${key===activeKey && unsaved ? ' <span style="color:var(--brass);font-weight:400;font-size:12px;">(editing)</span>' : ''}${delBtn}</td>
+        <td class="scenario-name">${esc(scen.label)}${isActive && unsaved ? '<span class="editing-tag">(editing)</span>' : ''}${delBtn}</td>
         <td>${totals.totalRooms}</td>
         <td>${totals.totalAL}</td>
         <td>${totals.totalBRE.toFixed(1)}</td>
         <td>${totals.techsNeeded.toFixed(1)}</td>
         <td>${techs}</td>
-        <td style="color:${totals.gap>0.05?'var(--bad)':(totals.gap<-0.05?'var(--good)':'var(--ink-soft)')}">${(totals.gap>=0?'+':'')+totals.gap.toFixed(1)}</td>
+        <td style="color:${gapColor}">${(totals.gap>=0?'+':'')+totals.gap.toFixed(1)}</td>
       `;
       compareBody.appendChild(tr);
     });
     compareBody.querySelectorAll('.del-scenario').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const key = btn.dataset.key;
-        const isShared = btn.dataset.shared === '1';
-        if (isShared) {
-          const scen = sharedScenarios[key];
-          if (!scen || !confirm(`Delete shared scenario "${scen.label}"? This removes it for everyone, not just you.`)) return;
-          jsonp(SHEETS_URL, { action: 'delete', id: key })
-            .then(() => refreshShared())
-            .then(() => { if (activeKey === key) loadScenario('2026-actual', false); })
-            .catch(() => alert('Could not delete from the shared sheet.'));
-        } else {
-          if (!confirm(`Delete saved scenario "${customScenarios[key].label}"? This can't be undone.`)) return;
-          delete customScenarios[key];
-          persistCustom();
-          if (activeKey === key) loadScenario('2026-actual', false);
-          populateSelect();
-          renderComparison();
-        }
+        deleteScenario(btn.dataset.key, btn.dataset.shared === '1');
       });
     });
+    renderChart(data);
   }
 
-  // wire up controls
+  function deleteScenario(key, isShared) {
+    if (isShared) {
+      const scen = sharedScenarios[key];
+      if (!scen || !confirm(`Delete shared portfolio "${scen.label}"? This removes it for everyone, not just you.`)) return;
+      jsonp(SHEETS_URL, { action: 'delete', id: key })
+        .then(() => refreshShared())
+        .then(() => { if (activeKey === key) loadScenario('2026-actual', false); })
+        .catch(() => alert('Could not delete from the shared sheet.'));
+    } else {
+      const scen = customScenarios[key];
+      if (!scen || !confirm(`Delete saved portfolio "${scen.label}"? This can't be undone.`)) return;
+      delete customScenarios[key];
+      persistCustom();
+      if (activeKey === key) { activeKey = '2026-actual'; populateSelect(); loadScenario(activeKey, false); }
+      else { populateSelect(); renderComparison(); }
+    }
+  }
+
+  /* ---------------- line chart ---------------- */
+  const chartBox = document.getElementById('chartBox');
+  const chartTip = document.getElementById('chartTip');
+  const chartLegend = document.getElementById('chartLegend');
+  const SVGNS = 'http://www.w3.org/2000/svg';
+
+  function niceMax(v) {
+    if (v <= 0) return 1;
+    const p = Math.pow(10, Math.floor(Math.log10(v)));
+    const n = v / p;
+    const step = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10;
+    return step * p;
+  }
+
+  function el(tag, attrs, text) {
+    const e = document.createElementNS(SVGNS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function truncate(s, n) { return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+
+  function renderChart(data) {
+    chartBox.querySelectorAll('svg, .chart-empty').forEach(n => n.remove());
+    const series = chartView === 'staff'
+      ? [
+          { name: 'Technicians needed', color: 'var(--series-1)', dash: false, get: d => d.totals.techsNeeded, fmt: v => v.toFixed(1) },
+          { name: 'Technicians on staff', color: 'var(--series-2)', dash: true, get: d => d.techs, fmt: v => (Math.round(v * 10) / 10).toString() },
+        ]
+      : [
+          { name: 'Weighted BRE', color: 'var(--series-1)', dash: false, get: d => d.totals.totalBRE, fmt: v => v.toFixed(1) },
+          { name: 'AV rooms', color: 'var(--series-2)', dash: true, get: d => d.totals.totalRooms, fmt: v => String(Math.round(v)) },
+        ];
+
+    chartLegend.innerHTML = series.map(s =>
+      `<span><i class="${s.dash ? 'dash' : ''}" style="border-color:${s.color}"></i>${s.name}</span>`).join('');
+
+    if (data.length < 2) {
+      const d = document.createElement('div');
+      d.className = 'chart-empty';
+      d.textContent = 'Save a portfolio to compare it here.';
+      chartBox.appendChild(d);
+      return;
+    }
+
+    const W = Math.max(chartBox.clientWidth, 300);
+    const narrow = W < 560;
+    const H = narrow ? 260 : 300;
+    const m = { top: 20, right: narrow ? 20 : 130, bottom: 44, left: 44 };
+    const iw = W - m.left - m.right, ih = H - m.top - m.bottom;
+    let maxV = 0;
+    data.forEach(d => series.forEach(s => { maxV = Math.max(maxV, s.get(d)); }));
+    const yMax = niceMax(maxV * 1.08);
+    const ticks = 4;
+    const n = data.length;
+    const xAt = i => m.left + (n === 1 ? iw / 2 : (i / (n - 1)) * iw);
+    const yAt = v => m.top + ih - (v / yMax) * ih;
+
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `Line chart comparing ${series.map(s => s.name).join(' and ')} across portfolios` });
+
+    for (let t = 0; t <= ticks; t++) {
+      const v = (yMax / ticks) * t;
+      const y = yAt(v);
+      svg.appendChild(el('line', { x1: m.left, x2: m.left + iw, y1: y, y2: y, class: 'grid-line' }));
+      svg.appendChild(el('text', { x: m.left - 8, y: y + 4, 'text-anchor': 'end', class: 'axis-text' }, (Math.round(v * 10) / 10).toString()));
+    }
+
+    const maxChars = Math.max(8, Math.floor((iw / Math.max(n - 1, 1)) / 7));
+    data.forEach((d, i) => {
+      const anchor = i === 0 ? 'start' : (i === n - 1 ? 'end' : 'middle');
+      svg.appendChild(el('text', { x: xAt(i), y: H - m.bottom + 22, 'text-anchor': anchor, class: 'x-text' + (d.isActive ? ' active' : '') },
+        truncate(d.scen.label, maxChars)));
+    });
+
+    const crosshair = el('line', { y1: m.top, y2: m.top + ih, class: 'crosshair', visibility: 'hidden' });
+    svg.appendChild(crosshair);
+
+    series.forEach(s => {
+      const pts = data.map((d, i) => `${xAt(i)},${yAt(s.get(d))}`).join(' ');
+      svg.appendChild(el('polyline', {
+        points: pts, fill: 'none', stroke: s.color, 'stroke-width': 2.5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round',
+        'stroke-dasharray': s.dash ? '6 5' : 'none',
+      }));
+      data.forEach((d, i) => {
+        svg.appendChild(el('circle', { cx: xAt(i), cy: yAt(s.get(d)), r: d.isActive ? 6 : 4.5, fill: s.color, stroke: 'var(--card)', 'stroke-width': 2 }));
+      });
+      if (!narrow) {
+        const last = data[n - 1];
+        svg.appendChild(el('text', { x: xAt(n - 1) + 12, y: yAt(s.get(last)) + 4, class: 'end-label' }, s.name.replace('Technicians ', 'Techs ')));
+      }
+    });
+
+    // de-collide end labels
+    if (!narrow) {
+      const labels = Array.from(svg.querySelectorAll('.end-label'));
+      if (labels.length === 2) {
+        const y0 = parseFloat(labels[0].getAttribute('y')), y1 = parseFloat(labels[1].getAttribute('y'));
+        if (Math.abs(y0 - y1) < 16) {
+          const mid = (y0 + y1) / 2, up = y0 <= y1 ? 0 : 1;
+          labels[up].setAttribute('y', mid - 8); labels[1 - up].setAttribute('y', mid + 8);
+        }
+      }
+    }
+
+    const hit = el('rect', { x: m.left - 20, y: m.top, width: iw + 40, height: ih, fill: 'transparent', style: 'cursor:crosshair' });
+    svg.appendChild(hit);
+
+    function showAt(clientX) {
+      const r = svg.getBoundingClientRect();
+      const scale = W / r.width;
+      const x = (clientX - r.left) * scale;
+      let idx = 0, best = Infinity;
+      for (let i = 0; i < n; i++) { const dd = Math.abs(xAt(i) - x); if (dd < best) { best = dd; idx = i; } }
+      const d = data[idx];
+      crosshair.setAttribute('x1', xAt(idx)); crosshair.setAttribute('x2', xAt(idx));
+      crosshair.setAttribute('visibility', 'visible');
+      chartTip.innerHTML = `<div class="t-title">${esc(d.scen.label)}</div>` + series.map(s =>
+        `<div class="t-row"><span><span class="sw" style="background:${s.color}"></span>${s.name}</span><b>${s.fmt(s.get(d))}</b></div>`).join('') +
+        (chartView === 'staff' ? `<div class="t-row"><span>Gap</span><b>${(d.totals.gap >= 0 ? '+' : '') + d.totals.gap.toFixed(1)}</b></div>` :
+          `<div class="t-row"><span>Active Learning</span><b>${d.totals.totalAL}</b></div>`);
+      chartTip.classList.add('show');
+      const px = xAt(idx) / scale;
+      const tipW = chartTip.offsetWidth;
+      let left = px + 14;
+      if (left + tipW > r.width) left = px - tipW - 14;
+      chartTip.style.left = Math.max(0, left) + 'px';
+      chartTip.style.top = (m.top / scale) + 'px';
+    }
+    function hide() { chartTip.classList.remove('show'); crosshair.setAttribute('visibility', 'hidden'); }
+    hit.addEventListener('mousemove', e => showAt(e.clientX));
+    hit.addEventListener('mouseleave', hide);
+    hit.addEventListener('touchstart', e => { if (e.touches[0]) showAt(e.touches[0].clientX); }, { passive: true });
+
+    chartBox.appendChild(svg);
+  }
+
+  document.querySelectorAll('.seg-small button').forEach(b => {
+    b.addEventListener('click', () => {
+      chartView = b.dataset.view;
+      document.querySelectorAll('.seg-small button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+      renderComparison();
+    });
+  });
+
+  let resizeTimer;
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(renderComparison, 120); });
+
+  /* ---------------- tabs ---------------- */
+  function showTab(name) {
+    const isCalc = name !== 'defs';
+    document.getElementById('tab-calc').setAttribute('aria-selected', isCalc);
+    document.getElementById('tab-defs').setAttribute('aria-selected', !isCalc);
+    document.getElementById('panel-calc').hidden = !isCalc;
+    document.getElementById('panel-defs').hidden = isCalc;
+    if (isCalc) renderComparison();
+  }
+  document.getElementById('tab-calc').addEventListener('click', () => { showTab('calc'); history.replaceState(null, '', '#calculator'); });
+  document.getElementById('tab-defs').addEventListener('click', () => { showTab('defs'); history.replaceState(null, '', '#definitions'); });
+  document.querySelectorAll('[data-goto="defs"]').forEach(b => b.addEventListener('click', () => {
+    showTab('defs'); history.replaceState(null, '', '#definitions'); window.scrollTo({ top: 0, behavior: 'smooth' });
+  }));
+
+  /* ---------------- controls ---------------- */
   document.getElementById('addRowBtn').addEventListener('click', () => {
     makeRow({ name: 'New area', rooms: 0, al: 0, seats: null });
     markUnsaved();
@@ -617,8 +1043,8 @@
   document.getElementById('capacityRow').addEventListener('click', (e) => {
     const opt = e.target.closest('.cap-opt');
     if (!opt) return;
-    document.querySelectorAll('.cap-opt').forEach(o => o.classList.remove('active'));
-    opt.classList.add('active');
+    document.querySelectorAll('.cap-opt').forEach(o => { o.classList.remove('active'); o.setAttribute('aria-checked', 'false'); });
+    opt.classList.add('active'); opt.setAttribute('aria-checked', 'true');
     capacity = parseFloat(opt.dataset.cap);
     recalc();
   });
@@ -626,7 +1052,7 @@
   currentTechsInput.addEventListener('input', () => { unsaved = true; updateUnsavedUI(); recalc(); });
 
   scenarioSelect.addEventListener('change', () => {
-    if (unsaved && !confirm('Discard unsaved changes to the current scenario?')) {
+    if (unsaved && !confirm('Discard unsaved changes to the current portfolio?')) {
       scenarioSelect.value = activeKey;
       return;
     }
@@ -664,7 +1090,7 @@
       jsonp(SHEETS_URL, { action: 'save', id: id, name: name, currentTechs: techs, rows: JSON.stringify(rows), createdBy: creator })
         .then(() => { saveRow.classList.remove('show'); return refreshShared(); })
         .then(() => { loadScenario(id, false); })
-        .catch(() => { alert('Could not save to the shared sheet — check the deployment URL and access settings.'); })
+        .catch(() => { alert('Could not save to the shared sheet.'); })
         .finally(() => { confirmBtn.disabled = false; confirmBtn.textContent = 'Save'; });
     } else {
       const key = 'custom-' + Date.now();
@@ -679,23 +1105,12 @@
   deleteBtn.addEventListener('click', () => {
     const scen = allScenarios()[activeKey];
     if (!scen || scen.builtin) return;
-    if (scen.shared) {
-      if (!confirm(`Delete shared scenario "${scen.label}"? This removes it for everyone, not just you.`)) return;
-      jsonp(SHEETS_URL, { action: 'delete', id: activeKey })
-        .then(() => refreshShared())
-        .then(() => { loadScenario('2026-actual', false); })
-        .catch(() => alert('Could not delete from the shared sheet.'));
-    } else {
-      if (!confirm(`Delete saved scenario "${scen.label}"? This can't be undone.`)) return;
-      delete customScenarios[activeKey];
-      persistCustom();
-      populateSelect();
-      loadScenario('2026-actual', false);
-    }
+    deleteScenario(activeKey, !!scen.shared);
   });
 
   populateSelect();
   loadScenario(activeKey, false);
+  if (location.hash === '#definitions') showTab('defs');
   refreshShared();
 })();
 </script>
