@@ -201,6 +201,7 @@
   .def h3 { font-family: 'Oswald', sans-serif; font-weight: 500; font-size: 18px; margin: 0 0 6px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
   .def h3 .abbr { font-family: 'Merriweather Sans', sans-serif; font-size: 11.5px; font-weight: 600; color: var(--accent2); background: var(--accent2-soft); padding: 2px 7px; letter-spacing: .03em; }
   .def p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+  .def p + p { margin-top: 8px; }
   .defs-section-title { font-family: 'Oswald', sans-serif; font-weight: 500; font-size: 24px; margin: 8px 0 14px; }
   .card h3 { font-family: 'Oswald', sans-serif; font-weight: 500; }
   .tier-table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -241,7 +242,7 @@
   <div class="masthead-inner">
     <p class="eyebrow">Classroom Technology Support</p>
     <h1>AV Support Staffing Calculator</h1>
-    <p class="dek">Estimates how many technicians are needed to support campus AV rooms, based on how many rooms each zone has and how many of them are complex Active Learning spaces. Use it to see where current staffing stands and how planned room changes would affect workload.</p>
+    <p class="dek">Estimates how many technicians are needed to support campus AV rooms, based on how many rooms each zone has and how many of them are Multi-Display Active Learning rooms, the most technology-intensive spaces on campus. Use it to see where current staffing stands and how planned room changes would affect workload.</p>
     <nav class="tabs" role="tablist" aria-label="Sections">
       <button class="tab" role="tab" id="tab-calc" aria-controls="panel-calc" aria-selected="true">Calculator</button>
       <button class="tab" role="tab" id="tab-defs" aria-controls="panel-defs" aria-selected="false">Definitions &amp; Method</button>
@@ -280,14 +281,14 @@
 
   <section>
     <h2>Rooms by zone</h2>
-    <p class="section-note">AV-equipped rooms in each support zone, and how many of those are Active Learning rooms.</p>
+    <p class="section-note">AV-equipped rooms in each support zone, and how many of those are Multi-Display Active Learning rooms.</p>
     <div class="table-scroll">
       <table class="grid-table">
         <thead>
           <tr>
             <th style="width:34%">Zone</th>
             <th class="num">Total AV rooms</th>
-            <th class="num">Active Learning rooms</th>
+            <th class="num">Multi-Display Active Learning</th>
             <th class="num seat-col">Seats <span style="font-weight:400;">(reference only)</span></th>
             <th style="width:30px"></th>
           </tr>
@@ -337,7 +338,7 @@
         <table class="zone-breakdown-table">
           <thead>
             <tr>
-              <th>Zone</th><th class="num">Rooms</th><th class="num">Active Learning</th>
+              <th>Zone</th><th class="num">Rooms</th><th class="num">Multi-Display AL</th>
               <th class="num">Weighted BRE</th><th class="bar-cell">Share of total</th>
             </tr>
           </thead>
@@ -354,7 +355,7 @@
       <table class="compare-table">
         <thead>
           <tr>
-            <th>Portfolio</th><th>Rooms</th><th>Active Learning</th><th>Weighted BRE</th>
+            <th>Portfolio</th><th>Rooms</th><th>Multi-Display AL</th><th>Weighted BRE</th>
             <th>Techs needed</th><th>Staff on hand</th><th>Gap</th>
           </tr>
         </thead>
@@ -380,12 +381,13 @@
       <p>The total workload for a zone or the whole campus: every room's BRE weight added together. Unlike a simple room count, it rises when existing rooms are upgraded with more technology, not only when new rooms are added.</p>
     </div>
     <div class="def">
-      <h3>Active Learning room</h3>
-      <p>A room built for group work, with multiple collaboration displays around the walls rather than a single screen at the front, typically with more sources, switching, and audio to match. In the audit these are identified by the wall-display collaboration flag. They are the most support-intensive room type, averaging 3.5 BRE.</p>
+      <h3>Multi-Display Active Learning room <span class="abbr">MDAL</span></h3>
+      <p>A room with multiple collaboration displays around the walls, each typically with its own sources, switching, and audio, so student groups can share and present from their tables. In the audit these are identified by the wall-display collaboration flag. They are the most support-intensive room type, averaging 3.5 BRE.</p>
+      <p>This is a technology category, not a teaching one. Many other rooms on campus support active learning through layout, furniture, or a single shared display; those are counted as other AV rooms because their support workload is closer to a standard classroom.</p>
     </div>
     <div class="def">
       <h3>Other AV rooms</h3>
-      <p>Every AV-equipped room that is not an Active Learning room, from basic classrooms to large lecture halls with lecture capture. In the 2026 audit these averaged 1.9 BRE.</p>
+      <p>Every AV-equipped room without a multi-display active learning setup: standard classrooms, labs, large lecture halls with lecture capture, and active learning spaces built around a single display. In the 2026 audit these averaged 1.9 BRE.</p>
     </div>
     <div class="def">
       <h3>Zone</h3>
@@ -413,15 +415,6 @@
     </div>
   </div>
 
-  <h2 class="defs-section-title">How the math works</h2>
-  <section class="math-block">
-    
-    <div class="formula">Weighted BRE = (Active Learning rooms × 3.5) + (all other rooms × 1.9)</div>
-    <p>This calculator is a condensed version of the full room-by-room complexity audit. In the audit, every AV room on campus is scored on five factors (display, control and switching, audio, video conferencing / lecture capture, and room type), placed into one of four complexity tiers, and weighted accordingly. Summing those weights gives the portfolio's total workload in basic room equivalents.</p>
-    <p>Analysis of the 2026 audit showed that one question, <b>is this an Active Learning room?</b>, accounts for most of the difference in workload between rooms. Active Learning rooms averaged <b>3.5 BRE</b> each; all other rooms averaged <b>1.9 BRE</b>. Those two averages are held constant across every portfolio so change is measured against a fixed yardstick.</p>
-    <p><b>Technicians needed</b> = Weighted BRE ÷ BRE per technician. <b>Staffing gap</b> = technicians needed − technicians on staff.</p>
-  </section>
-
   <h2 class="defs-section-title">The full complexity audit</h2>
   <div class="two-col stack">
     <section class="card">
@@ -445,20 +438,17 @@
         <li><b>Control &amp; switching</b>: control system and signal routing</li>
         <li><b>Audio</b>: program audio, voice reinforcement, microphones</li>
         <li><b>Video conferencing / lecture capture</b>: cameras, capture, document cameras</li>
-        <li><b>Room type</b>: standard classroom through Active Learning and SCALE-UP</li>
+        <li><b>Room type</b>: standard classroom through multi-display active learning and SCALE-UP</li>
       </ol>
     </section>
   </div>
 
-  <section class="method">
-    <div class="method-icon" aria-hidden="true">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
-    </div>
-    <div>
-      <h3>Where the calculator came from</h3>
-      <p>The full audit is the detailed model: every room scored, tiered, and weighted. The calculator compresses it into two inputs per zone so the staffing picture can be explored live in a meeting. Using the 2026 audit, the average BRE weight was computed separately for Active Learning rooms (3.5) and all other rooms (1.9). Multiplying each zone's room counts by those averages closely reproduces the audit's campus-wide total.</p>
-      <p>Because the two averages are fixed, the calculator responds to changes in the number and mix of rooms. If the rubric or the typical room build changes significantly, the averages should be recalculated from a fresh audit.</p>
-    </div>
+  <h2 class="defs-section-title">How the math works</h2>
+  <section class="math-block">
+    <div class="formula">Weighted BRE = (Multi-Display Active Learning rooms × 3.5) + (all other rooms × 1.9)</div>
+    <p>The full complexity audit above is the detailed model: every AV room is scored, placed in a tier, and weighted, and those weights add up to the portfolio's total workload in basic room equivalents. This calculator condenses that model into two inputs per zone so the staffing picture can be explored live in a meeting.</p>
+    <p>Analysis of the 2026 audit showed that one question, <b>does this room have a multi-display active learning setup?</b>, accounts for most of the difference in workload between rooms. Multi-Display Active Learning rooms averaged <b>3.5 BRE</b> each; all other rooms averaged <b>1.9 BRE</b>. Multiplying each zone's room counts by those two averages closely reproduces the audit's campus-wide total. The averages are held constant across every portfolio so change is measured against a fixed yardstick, and should be recalculated from a fresh audit if the rubric or typical room build changes significantly.</p>
+    <p><b>Technicians needed</b> = Weighted BRE ÷ BRE per technician. <b>Staffing gap</b> = technicians needed − technicians on staff.</p>
   </section>
 </div>
 
@@ -648,7 +638,7 @@
     tr.innerHTML = `
       <td><input type="text" class="f-name" value="${esc(data.name)}" aria-label="Zone name"></td>
       <td class="num"><input type="number" class="f-rooms" value="${data.rooms}" min="0" aria-label="AV rooms"></td>
-      <td class="num"><input type="number" class="f-al" value="${data.al}" min="0" aria-label="Active Learning rooms"></td>
+      <td class="num"><input type="number" class="f-al" value="${data.al}" min="0" aria-label="Multi-Display Active Learning rooms"></td>
       <td class="num seat-col"><input type="number" class="f-seats" value="${seatVal}" min="0" placeholder="—" aria-label="Seats"></td>
       <td><button class="rm-btn" title="Remove zone" aria-label="Remove zone">×</button></td>
     `;
