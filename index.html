@@ -305,8 +305,8 @@
     <div class="capacity-row" id="capacityRow" role="radiogroup" aria-label="BRE per technician">
       <button class="cap-opt" data-cap="30" role="radio">30 BRE / tech</button>
       <button class="cap-opt" data-cap="40" role="radio">40 BRE / tech</button>
-      <button class="cap-opt active" data-cap="50" role="radio">50 BRE / tech</button>
-      <button class="cap-opt" data-cap="60" role="radio">60 BRE / tech</button>
+      <button class="cap-opt" data-cap="50" role="radio">50 BRE / tech</button>
+      <button class="cap-opt active" data-cap="60" role="radio">60 BRE / tech</button>
     </div>
     <div class="headcount-field">
       <label for="currentTechs">Technicians on staff for this portfolio:</label>
@@ -411,7 +411,7 @@
     </div>
     <div class="def">
       <h3>Portfolio</h3>
-      <p>A complete set of rooms-by-zone numbers plus the technician headcount. The built-in portfolios are the 2020 and 2026 complexity audits and the 2027 proposed zone layout; saved portfolios model proposed changes such as new buildings or renovations.</p>
+      <p>A complete set of rooms-by-zone numbers plus the technician headcount. The built-in portfolios are the 2020, 2026, and Spring 2027 complexity audits, plus the 2027 audit mapped to the proposed new zones with an added technician; saved portfolios model proposed changes such as new buildings or renovations.</p>
     </div>
   </div>
 
@@ -502,14 +502,25 @@
         { name: 'Central', rooms: 34, al: 5,  seats: 2015 },
         { name: 'MLC',     rooms: 41, al: 7,  seats: 3310 },
         { name: 'North',   rooms: 19, al: 0,  seats: 2059 },
+        { name: 'SLC',     rooms: 55, al: 13, seats: 3243 },
+        { name: 'South',   rooms: 22, al: 2,  seats: 2435 },
+      ],
+    },
+    '2027-spring': {
+      label: '2027 Audit - Spring',
+      builtin: true,
+      currentTechs: 5,
+      rows: [
+        { name: 'Central', rooms: 34, al: 5,  seats: 2015 },
+        { name: 'MLC',     rooms: 41, al: 7,  seats: 3310 },
+        { name: 'North',   rooms: 19, al: 0,  seats: 2059 },
         { name: 'SLC',     rooms: 65, al: 23, seats: 3243 },
         { name: 'South',   rooms: 22, al: 2,  seats: 2435 },
       ],
     },
     '2027-proposed-zones': {
-      label: '2027 Proposed Zones',
+      label: '2027 Audit - New Zones / New Technician',
       builtin: true,
-      proposal: true,
       currentTechs: 6,
       rows: [
         { name: 'MLC',           rooms: 36, al: 2,  seats: 2954 },
@@ -569,7 +580,7 @@
   function cloneRows(rows) { return rows.map(r => Object.assign({}, r)); }
 
   let activeKey = '2026-actual';
-  let capacity = 50;
+  let capacity = 60;
   let unsaved = false;
 
   const scenarioSelect = document.getElementById('scenarioSelect');
@@ -586,11 +597,8 @@
 
   function populateSelect() {
     scenarioSelect.innerHTML = '';
-    const audits = {}, proposals = {};
-    Object.keys(BUILTIN_SCENARIOS).forEach(k => { (BUILTIN_SCENARIOS[k].proposal ? proposals : audits)[k] = BUILTIN_SCENARIOS[k]; });
     const groups = [
-      ['Complexity audits', audits],
-      ['Proposals', proposals],
+      ['Complexity audits', BUILTIN_SCENARIOS],
       ['Shared', sharedScenarios],
       ['Saved by you', customScenarios],
     ];
